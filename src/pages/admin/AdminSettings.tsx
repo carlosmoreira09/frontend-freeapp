@@ -18,8 +18,8 @@ const AdminSettings: React.FC = () => {
   
   // Initial settings (would normally be fetched from API)
   const [settings, setSettings] = useState<SystemSettings>({
-    siteName: 'AppFree',
-    contactEmail: 'admin@appfree.com',
+    siteName: 'FreeApp',
+    contactEmail: 'admin@FreeApp.com',
     allowRegistration: false,
     maintenanceMode: false,
     notificationsEnabled: true,

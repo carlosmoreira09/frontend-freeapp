@@ -1,21 +1,26 @@
-/**
- * Admin related types
- */
-/**
- * Admin related types
- */
-import type {Client} from './auth';
 
-// Admin client data interface
+import type {Client} from './auth';
+import { MaritalStatus } from './enum';
+
 export interface AdminClientData extends Client {
   status: 'active' | 'inactive' | 'pending' | 'suspended';
   createdAt: string;
   lastLogin?: string;
   totalTransactions?: number;
   balance?: number;
+  cpf: string;
+  birthday?: string;
+  age?: number;
+  salary?: number;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  complement?: string;
+  maritalStatus?: MaritalStatus;
+  isActive?: boolean;
+  managerId?: string;
 }
 
-// System settings interface
 export interface SystemSettings {
   siteName: string;
   contactEmail: string;

@@ -16,7 +16,7 @@ const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
       <MobileFooterMenu />
       <footer className="bg-orange-800 text-white py-4 hidden md:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
-          &copy; {new Date().getFullYear()} AppFree - Liberdade | Organização | Facilidade | Orgânico. All rights reserved.
+          &copy; {new Date().getFullYear()} FreeApp - Liberdade | Organização | Facilidade | Orgânico. All rights reserved.
         </div>
       </footer>
     </div>

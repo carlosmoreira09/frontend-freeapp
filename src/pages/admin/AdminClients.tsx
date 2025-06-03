@@ -1,91 +1,164 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
+import { toast } from 'react-hot-toast';
+import {type AdminClientData, MaritalStatus} from "../../types";
 
-// Mock client data
-interface ClientData {
-  id: string;
-  name: string;
-  email: string;
-  createdAt: string;
-  status: 'active' | 'inactive' | 'pending';
-}
-
-const mockClients: ClientData[] = [
+const mockClients: AdminClientData[] = [
   {
+    status: 'active',
+    createdAt: 'teste',
+    lastLogin: 'teste',
+    totalTransactions: 55,
+    balance: 32,
+    cpf: 'teste',
+    birthday: 'teste',
+    age: 15,
+    salary: 5533.33,
+    city: 'teste',
+    state: 'teste',
+    zipCode: 'teste',
+    complement: 'teste',
+    maritalStatus: MaritalStatus.MARRIED,
+    isActive: true,
+    managerId: '24',
     id: '1',
     name: 'João Silva',
-    email: 'joao.silva@example.com',
-    createdAt: '2023-01-15',
-    status: 'active',
+    email: 'joao.silva@example.com'
   },
   {
+    status: 'active',
+    createdAt: '2023-02-20',
+    cpf: '222.222.222-22',
+    isActive: true,
     id: '2',
     name: 'Maria Souza',
-    email: 'maria.souza@example.com',
-    createdAt: '2023-02-20',
-    status: 'active',
+    email: 'maria.souza@example.com'
   },
   {
+    status: 'inactive',
+    createdAt: '2023-03-10',
+    cpf: '333.333.333-33',
+    isActive: false,
     id: '3',
     name: 'Roberto Oliveira',
-    email: 'roberto.oliveira@example.com',
-    createdAt: '2023-03-10',
-    status: 'inactive',
+    email: 'roberto.oliveira@example.com'
   },
   {
+    status: 'pending',
+    createdAt: '2023-04-05',
+    cpf: '444.444.444-44',
+    isActive: true,
     id: '4',
     name: 'Ana Santos',
-    email: 'ana.santos@example.com',
-    createdAt: '2023-04-05',
-    status: 'pending',
+    email: 'ana.santos@example.com'
   },
   {
+    status: 'active',
+    createdAt: '2023-05-01',
+    cpf: '555.555.555-55',
+    isActive: true,
     id: '5',
     name: 'Carlos Ferreira',
-    email: 'carlos.ferreira@example.com',
-    createdAt: '2023-05-01',
-    status: 'active',
+    email: 'carlos.ferreira@example.com'
   },
 ];
 
 const AdminClients: React.FC = () => {
-  const [clients, setClients] = useState<ClientData[]>([]);
+  const [clients, setClients] = useState<AdminClientData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const navigate = useNavigate();
 
+  // Load clients from API
   useEffect(() => {
-    // Simulate API call to fetch clients
-    const fetchClients = async () => {
-      try {
-        // In a real app, you would fetch from an API
-        // const response = await api.get('/clients');
-        // setClients(response.data);
-        
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setClients(mockClients);
-        setLoading(false);
-      } catch (err) {
-        console.error('Erro ao buscar clientes:', err);
-        setError('Falha ao carregar clientes. Por favor, tente novamente mais tarde.');
-        setLoading(false);
-      }
-    };
-
     fetchClients();
-  }, []);
+  }, [page, limit, statusFilter]);
 
-  const filteredClients = clients.filter(client => {
-    const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         client.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || client.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
+  // Fetch clients from API
+  const fetchClients = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // In a real app, you would fetch from the API
+      // const response = await adminService.getClients(page, limit, searchTerm, statusFilter !== 'all' ? statusFilter : '');
+      // setClients(response.clients);
+      // setTotal(response.total);
+      
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Filter mock clients based on search and status
+      const filteredMockClients = mockClients.filter(client => {
+        const matchesSearch = 
+          searchTerm === '' || 
+          client.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+          client.email.toLowerCase().includes(searchTerm.toLowerCase());
+        
+        const matchesStatus = statusFilter === 'all' || client.status === statusFilter;
+        
+        return matchesSearch && matchesStatus;
+      });
+      
+      setClients(filteredMockClients);
+      setTotal(filteredMockClients.length);
+      setLoading(false);
+    } catch (err) {
+      console.error('Erro ao buscar clientes:', err);
+      setError('Falha ao carregar clientes. Por favor, tente novamente mais tarde.');
+      setLoading(false);
+    }
+  };
 
+  // Handle search
+  const handleSearch = () => {
+    setPage(1); // Reset to first page when searching
+    fetchClients();
+  };
+
+  // Navigate to create client page
+  const handleAddClient = () => {
+    navigate('/admin/clients/new');
+  };
+
+  // Navigate to edit client page
+  const handleEditClient = (id: string) => {
+    navigate(`/admin/clients/edit/${id}`);
+  };
+
+  // Handle client deletion
+  const handleDeleteClient = async (id: string) => {
+    try {
+      setIsDeleting(id);
+      
+      // In a real app, you would call the API
+      // await adminService.deleteClient(id);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Remove from list
+      setClients(prev => prev.filter(client => client.id !== id));
+      setTotal(prev => prev - 1);
+      
+      // Show success message
+      toast.success('Cliente excluído com sucesso!');
+    } catch (err) {
+      console.error('Erro ao excluir cliente:', err);
+      toast.error('Falha ao excluir cliente. Por favor, tente novamente.');
+    } finally {
+      setIsDeleting(null);
+    }
+  };
+
+  // Get status color
   const getStatusColor = (status: string): string => {
     switch (status) {
       case 'active':
@@ -94,10 +167,38 @@ const AdminClients: React.FC = () => {
         return 'bg-red-100 text-red-800';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
+      case 'suspended':
+        return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // Get status label
+  const getStatusLabel = (status: string): string => {
+    switch (status) {
+      case 'active':
+        return 'Ativo';
+      case 'inactive':
+        return 'Inativo';
+      case 'pending':
+        return 'Pendente';
+      case 'suspended':
+        return 'Suspenso';
+      default:
+        return status;
+    }
+  };
+
+  // Filter clients based on search term and status
+  const filteredClients = clients.filter(client => {
+    const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         client.email.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'all' || client.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
 
   return (
     <Layout>
@@ -152,6 +253,7 @@ const AdminClients: React.FC = () => {
                 <button
                   type="button"
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-200"
+                  onClick={handleAddClient}
                 >
                   Adicionar Novo Cliente
                 </button>
@@ -251,16 +353,30 @@ const AdminClients: React.FC = () => {
                                 client.status
                               )}`}
                             >
-                              {client.status === 'active' ? 'Ativo' : 
-                               client.status === 'inactive' ? 'Inativo' : 'Pendente'}
+                              {getStatusLabel(client.status)}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button className="text-orange-600 hover:text-orange-900 mr-4">
+                            <button 
+                              className="text-orange-600 hover:text-orange-900 mr-4"
+                              onClick={() => handleEditClient(client.id)}
+                            >
                               Editar
                             </button>
-                            <button className="text-red-600 hover:text-red-900">
-                              Excluir
+                            <button 
+                              className="text-red-600 hover:text-red-900"
+                              onClick={() => handleDeleteClient(client.id)}
+                              disabled={isDeleting === client.id}
+                            >
+                              {isDeleting === client.id ? (
+                                <span className="flex items-center">
+                                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  Excluindo...
+                                </span>
+                              ) : 'Excluir'}
                             </button>
                           </td>
                         </tr>

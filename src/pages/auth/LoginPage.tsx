@@ -36,10 +36,10 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white flex flex-col md:items-center md:justify-center py-0 md:py-12 px-0 md:px-6">
+    <div className="min-h-screen bg-gradient-to-b from-orange-100 to-white flex flex-col md:items-center md:justify-center py-0 md:py-20 px-0 md:px-6">
       {/* Mobile header - only visible on mobile */}
       <div className="bg-orange-600 w-full py-6 px-4 flex items-center justify-center md:hidden">
-        <h1 className="text-white text-2xl font-bold">AppFree</h1>
+        <h1 className="text-white text-2xl font-bold">FreeApp</h1>
       </div>
       
       <div className="w-full max-w-md md:shadow-lg md:rounded-lg md:border md:border-orange-100 md:bg-white md:p-8 p-4 flex-1 flex flex-col justify-center">
@@ -181,7 +181,7 @@ const LoginPage: React.FC = () => {
       
       {/* Mobile footer - only visible on mobile */}
       <div className="w-full py-4 px-4 text-center text-xs text-gray-500 md:hidden">
-        &copy; {new Date().getFullYear()} AppFree - Todos os direitos reservados
+        &copy; {new Date().getFullYear()} FreeApp - Todos os direitos reservados
       </div>
     </div>
   );

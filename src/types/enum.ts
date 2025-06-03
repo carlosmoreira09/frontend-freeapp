@@ -15,3 +15,12 @@ export enum RoleType {
   MANAGER = 'manager',
   CLIENT = 'client'
 }
+
+// Marital status types
+export enum MaritalStatus {
+  SINGLE = "single",
+  MARRIED = "married",
+  DIVORCED = "divorced",
+  WIDOWED = "widowed",
+  OTHER = "other"
+}

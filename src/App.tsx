@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
+import { Toaster } from 'react-hot-toast'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
 import ClientDashboard from './pages/client/ClientDashboard'
@@ -8,6 +9,7 @@ import ClientTransactions from './pages/client/ClientTransactions'
 import AddTransaction from './pages/client/AddTransaction'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminClients from './pages/admin/AdminClients'
+import ClientFormPage from './pages/admin/ClientFormPage'
 import AdminSettings from './pages/admin/AdminSettings'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { AuthType } from './types'
@@ -39,12 +41,41 @@ function App() {
           <Route element={<ProtectedRoute allowedAuthTypes={[AuthType.ADMIN]} adminOnly={true} />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/clients" element={<AdminClients />} />
+            <Route path="/admin/clients/new" element={<ClientFormPage />} />
+            <Route path="/admin/clients/edit/:id" element={<ClientFormPage />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
           </Route>
           
           {/* Catch all - redirect to login */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
+        
+        {/* Toast notifications */}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: '#fff',
+              color: '#333',
+            },
+            success: {
+              style: {
+                background: '#f0fdf4',
+                border: '1px solid #bbf7d0',
+                color: '#166534',
+              },
+            },
+            error: {
+              style: {
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                color: '#b91c1c',
+              },
+              duration: 4000,
+            },
+          }}
+        />
       </Router>
     </AuthProvider>
   )
