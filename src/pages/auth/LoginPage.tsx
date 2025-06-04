@@ -22,7 +22,6 @@ const LoginPage: React.FC = () => {
     
     try {
      const result = await login(email, password);
-     console.log(result)
       // Redirect based on login type
       if (loginType === 'admin') {
         navigate('/admin/dashboard');

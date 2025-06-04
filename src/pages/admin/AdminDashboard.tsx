@@ -38,7 +38,6 @@ const AdminDashboard: React.FC = () => {
     const fetchDashboardStats = async () => {
       try {
         const response = await api.get('/clients/stats/dashboard');
-        console.log(response)
         setStats(response.data);
         setLoading(false);
       } catch (err) {
@@ -51,7 +50,6 @@ const AdminDashboard: React.FC = () => {
     const fetchRecentActivities = async () => {
       try {
         const response = await api.get('/clients/stats/recent-activities');
-        console.log(response)
         setRecentActivities(response.data);
         setActivitiesLoading(false);
       } catch (err) {
@@ -125,7 +123,7 @@ const AdminDashboard: React.FC = () => {
                 </Link>
                 <Link
                     to="/admin/settings"
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 transition-colors duration-200"
+                    className="hidden items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 transition-colors duration-200"
                 >
                   Gerenciar Configurações
                 </Link>
@@ -185,8 +183,33 @@ const AdminDashboard: React.FC = () => {
             </div>
           </Link>
 
-          <Link to="/admin/settings" className="block hover:shadow-lg transition-shadow duration-300">
+          <Link to="/admin/transactions" className="block hover:shadow-lg transition-shadow duration-300">
             <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 bg-orange-400 rounded-md p-3">
+                    <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div className="ml-5">
+                    <h3 className="text-lg font-medium text-gray-900">Transações Diárias</h3>
+                    <p className="mt-1 text-sm text-gray-500">Visualizar e analisar transações dos clientes</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-orange-50 px-4 py-4 sm:px-6">
+                <div className="text-sm">
+                  <span className="font-medium text-orange-600 hover:text-orange-500">
+                    Ver transações <span aria-hidden="true">&rarr;</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Link>
+
+          <Link to="/admin/settings" className="hidden  hover:shadow-lg transition-shadow duration-300">
+            <div className=" hidden bg-white overflow-hidden shadow rounded-lg">
               <div className="px-4 py-5 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 bg-orange-600 rounded-md p-3">
@@ -195,7 +218,7 @@ const AdminDashboard: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
-                  <div className="ml-5">
+                  <div className="ml-5 hidden">
                     <h3 className="text-lg font-medium text-gray-900">Configurações do Sistema</h3>
                     <p className="mt-1 text-sm text-gray-500">Configurar ajustes da aplicação</p>
                   </div>

@@ -11,6 +11,7 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminClients from './pages/admin/AdminClients'
 import ClientFormPage from './pages/admin/ClientFormPage'
 import AdminSettings from './pages/admin/AdminSettings'
+import AdminDailyTransactions from './pages/admin/AdminDailyTransactions'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { AuthType } from './types'
 
@@ -44,6 +45,7 @@ function App() {
             <Route path="/admin/clients/new" element={<ClientFormPage />} />
             <Route path="/admin/clients/edit/:id" element={<ClientFormPage />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/admin/transactions" element={<AdminDailyTransactions />} />
           </Route>
           
           {/* Catch all - redirect to login */}
