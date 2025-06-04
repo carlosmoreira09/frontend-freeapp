@@ -4,7 +4,6 @@
 
 // Authentication types
 export enum AuthType {
-  USER = 'user',
   CLIENT = 'client',
   ADMIN = 'admin'
 }

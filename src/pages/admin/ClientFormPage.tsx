@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
 import { toast } from 'react-hot-toast';
-import { MaritalStatus, type AdminClientData } from '../../types';
+import { MaritalStatus } from '../../types';
 import {adminService} from "../../services";
 
 const ClientFormPage: React.FC = () => {
@@ -11,8 +11,7 @@ const ClientFormPage: React.FC = () => {
   const isEditMode = !!id;
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [client, setClient] = useState<AdminClientData | null>(null);
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -48,58 +47,30 @@ const ClientFormPage: React.FC = () => {
     
     try {
       setLoading(true);
-      
-      // In a real app, you would fetch from the API
-      // const client = await adminService.getClient(id);
-      
-      // Simulate API call with mock data
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Mock client data
-      const mockClient: AdminClientData = {
-        id,
-        name: 'Cliente de Teste',
-        email: 'cliente@teste.com',
-        cpf: '123.456.789-00',
-        phone: '(11) 98765-4321',
-        birthday: '1990-01-01',
-        age: 33,
-        salary: 5000,
-        address: 'Rua Teste, 123',
-        city: 'São Paulo',
-        state: 'SP',
-        zipCode: '01234-567',
-        complement: 'Apto 123',
-        maritalStatus: MaritalStatus.SINGLE,
-        isActive: true,
-        managerId: '',
-        status: 'active',
-        createdAt: new Date().toISOString()
-      };
-      
-      setClient(mockClient);
-      
+      const response = await adminService.getClient(id);
+      if(response) {
       // Update form data
       setFormData({
         ...formData,
-        name: mockClient.name,
-        email: mockClient.email,
-        cpf: mockClient.cpf || '',
-        phone: mockClient.phone || '',
-        birthday: mockClient.birthday || '',
-        age: mockClient.age?.toString() || '',
-        salary: mockClient.salary?.toString() || '',
-        address: mockClient.address || '',
-        city: mockClient.city || '',
-        state: mockClient.state || '',
-        zipCode: mockClient.zipCode || '',
-        complement: mockClient.complement || '',
-        maritalStatus: mockClient.maritalStatus || MaritalStatus.SINGLE,
-        isActive: mockClient.isActive ?? true,
-        managerId: mockClient.managerId || '',
+        name: response.name,
+        email: response.email,
+        cpf: response.cpf || '',
+        phone: response.phone || '',
+        birthday: response.birthday || '',
+        age: response.age?.toString() || '',
+        salary: response.salary?.toString() || '',
+        address: response.address || '',
+        city: response.city || '',
+        state: response.state || '',
+        zipCode: response.zipCode || '',
+        complement: response.complement || '',
+        maritalStatus: response.maritalStatus || MaritalStatus.SINGLE,
+        isActive: response.isActive ?? true,
         password: '',
         confirmPassword: ''
       });
+      }
+
     } catch (error) {
       console.error('Error fetching client:', error);
       toast.error('Não foi possível carregar os dados do cliente.');

@@ -4,40 +4,40 @@ import type {AdminClientData, SystemSettings, AdminDashboardData} from '../types
 // Admin service
 const adminService = {
   // Get all clients
-  getClients: async (page = 1, limit = 10, search = '', status = ''): Promise<{ clients: AdminClientData[], total: number }> => {
-    const response = await api.get<{ clients: AdminClientData[], total: number }>(
-      `/admin/clients?page=${page}&limit=${limit}&search=${search}${status ? `&status=${status}` : ''}`
+  getClients: async (page = 1, limit = 10, search = '', status = ''): Promise<{ clients: AdminClientData[], pagination: any }> => {
+    const response = await api.get<{ clients: AdminClientData[], pagination: any }>(
+      `/clients?page=${page}&limit=${limit}&search=${search}${status ? `&status=${status}` : ''}`
     );
     return response.data;
   },
 
   // Get client by ID
   getClient: async (id: string): Promise<AdminClientData> => {
-    const response = await api.get<AdminClientData>(`/admin/clients/${id}`);
+    const response = await api.get<AdminClientData>(`/clients/${id}`);
     return response.data;
   },
 
   // Create new client
   createClient: async (client: Omit<AdminClientData, 'id' | 'createdAt' | 'status'>): Promise<AdminClientData> => {
-    const response = await api.post<AdminClientData>('/admin/clients', client);
+    const response = await api.post<AdminClientData>('/clients', client);
     return response.data;
   },
 
   // Update client
   updateClient: async (id: string, client: Partial<AdminClientData>): Promise<AdminClientData> => {
-    const response = await api.put<AdminClientData>(`/admin/clients/${id}`, client);
+    const response = await api.put<AdminClientData>(`/clients/${id}`, client);
     return response.data;
   },
 
   // Delete client
   deleteClient: async (id: string): Promise<{ success: boolean; message: string }> => {
-    const response = await api.delete(`/admin/clients/${id}`);
+    const response = await api.delete(`/clients/${id}`);
     return response.data;
   },
 
   // Get system settings
   getSettings: async (): Promise<SystemSettings> => {
-    const response = await api.get<SystemSettings>('/admin/settings');
+    const response = await api.get<SystemSettings>('/settings');
     return response.data;
   },
 

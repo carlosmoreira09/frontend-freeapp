@@ -31,7 +31,7 @@ const Navbar: React.FC = () => {
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                {isAuthenticated && authType === AuthType.USER && (
+                {isAuthenticated && authType === AuthType.ADMIN && (
                   <>
                     <Link
                       to="/admin/dashboard"
@@ -172,7 +172,7 @@ const Navbar: React.FC = () => {
       {menuOpen && (
         <div className="md:hidden" id="mobile-menu">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {isAuthenticated && authType === AuthType.USER && (
+            {isAuthenticated && authType === AuthType.ADMIN && (
               <>
                 <Link
                   to="/admin/dashboard"

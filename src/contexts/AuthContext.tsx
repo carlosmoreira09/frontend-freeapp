@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setAuthType(storedAuthType);
           setIsAuthenticated(true);
           
-          if (storedAuthType === AuthType.USER) {
+          if (storedAuthType === AuthType.ADMIN) {
             const userStr = localStorage.getItem('user');
             if (userStr) {
               setUser(JSON.parse(userStr));

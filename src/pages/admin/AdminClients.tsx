@@ -1,68 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
 import { toast } from 'react-hot-toast';
-import {type AdminClientData, MaritalStatus} from "../../types";
+import {type AdminClientData, adminService} from '../../services';
 
-const mockClients: AdminClientData[] = [
-  {
-    status: 'active',
-    createdAt: 'teste',
-    lastLogin: 'teste',
-    totalTransactions: 55,
-    balance: 32,
-    cpf: 'teste',
-    birthday: 'teste',
-    age: 15,
-    salary: 5533.33,
-    city: 'teste',
-    state: 'teste',
-    zipCode: 'teste',
-    complement: 'teste',
-    maritalStatus: MaritalStatus.MARRIED,
-    isActive: true,
-    managerId: '24',
-    id: '1',
-    name: 'João Silva',
-    email: 'joao.silva@example.com'
-  },
-  {
-    status: 'active',
-    createdAt: '2023-02-20',
-    cpf: '222.222.222-22',
-    isActive: true,
-    id: '2',
-    name: 'Maria Souza',
-    email: 'maria.souza@example.com'
-  },
-  {
-    status: 'inactive',
-    createdAt: '2023-03-10',
-    cpf: '333.333.333-33',
-    isActive: false,
-    id: '3',
-    name: 'Roberto Oliveira',
-    email: 'roberto.oliveira@example.com'
-  },
-  {
-    status: 'pending',
-    createdAt: '2023-04-05',
-    cpf: '444.444.444-44',
-    isActive: true,
-    id: '4',
-    name: 'Ana Santos',
-    email: 'ana.santos@example.com'
-  },
-  {
-    status: 'active',
-    createdAt: '2023-05-01',
-    cpf: '555.555.555-55',
-    isActive: true,
-    id: '5',
-    name: 'Carlos Ferreira',
-    email: 'carlos.ferreira@example.com'
-  },
-];
 
 const AdminClients: React.FC = () => {
   const [clients, setClients] = useState<AdminClientData[]>([]);
@@ -71,56 +12,34 @@ const AdminClients: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [total, setTotal] = useState(0);
+  const [limit, setLimit] = useState(100);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Load clients from API
   useEffect(() => {
-    fetchClients();
+    fetchClients().then();
   }, [page, limit, statusFilter]);
 
   // Fetch clients from API
   const fetchClients = async () => {
     try {
+      setPage(1)
+      setLimit(100)
       setLoading(true);
       setError(null);
       
-      // In a real app, you would fetch from the API
-      // const response = await adminService.getClients(page, limit, searchTerm, statusFilter !== 'all' ? statusFilter : '');
-      // setClients(response.clients);
-      // setTotal(response.total);
-      
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Filter mock clients based on search and status
-      const filteredMockClients = mockClients.filter(client => {
-        const matchesSearch = 
-          searchTerm === '' || 
-          client.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-          client.email.toLowerCase().includes(searchTerm.toLowerCase());
-        
-        const matchesStatus = statusFilter === 'all' || client.status === statusFilter;
-        
-        return matchesSearch && matchesStatus;
-      });
-      
-      setClients(filteredMockClients);
-      setTotal(filteredMockClients.length);
+      const response = await adminService.getClients(page, limit, searchTerm, statusFilter !== 'all' ? statusFilter : '');
+      if(response && response.clients) {
+        setClients(response.clients);
+      }
+
       setLoading(false);
     } catch (err) {
       console.error('Erro ao buscar clientes:', err);
       setError('Falha ao carregar clientes. Por favor, tente novamente mais tarde.');
       setLoading(false);
     }
-  };
-
-  // Handle search
-  const handleSearch = () => {
-    setPage(1); // Reset to first page when searching
-    fetchClients();
   };
 
   // Navigate to create client page
@@ -138,18 +57,9 @@ const AdminClients: React.FC = () => {
     try {
       setIsDeleting(id);
       
-      // In a real app, you would call the API
-      // await adminService.deleteClient(id);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Remove from list
-      setClients(prev => prev.filter(client => client.id !== id));
-      setTotal(prev => prev - 1);
-      
-      // Show success message
+      await adminService.deleteClient(id);
       toast.success('Cliente excluído com sucesso!');
+      fetchClients().then()
     } catch (err) {
       console.error('Erro ao excluir cliente:', err);
       toast.error('Falha ao excluir cliente. Por favor, tente novamente.');
@@ -194,9 +104,9 @@ const AdminClients: React.FC = () => {
   const filteredClients = clients.filter(client => {
     const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          client.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = statusFilter === 'all' || client.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 

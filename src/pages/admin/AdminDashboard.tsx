@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
+import {api} from "../../services";
 
-// Mock data for dashboard stats
+// Dashboard stats interface
 interface DashboardStats {
   totalClients: number;
   activeClients: number;
@@ -13,31 +14,32 @@ interface DashboardStats {
   lastLoginDate: string;
 }
 
+// Recent activity interface
+interface RecentActivity {
+  type: 'transaction' | 'registration' | 'system';
+  clientId?: string;
+  clientName?: string;
+  description: string;
+  amount?: number;
+  transactionType?: 'income' | 'expense';
+  date: string;
+  client: any;
+}
+
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activitiesLoading, setActivitiesLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API call to fetch dashboard stats
+    // Fetch dashboard stats from our new endpoint
     const fetchDashboardStats = async () => {
       try {
-        // In a real app, you would fetch from an API
-        // const response = await api.get('/admin/stats');
-        // setStats(response.data);
-        
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock data
-        setStats({
-          totalClients: 42,
-          activeClients: 38,
-          totalRevenue: 15750.25,
-          pendingApprovals: 3,
-          systemStatus: 'operational',
-          lastLoginDate: new Date().toISOString(),
-        });
+        const response = await api.get('/clients/stats/dashboard');
+        console.log(response)
+        setStats(response.data);
         setLoading(false);
       } catch (err) {
         console.error('Error fetching dashboard stats:', err);
@@ -45,26 +47,52 @@ const AdminDashboard: React.FC = () => {
       }
     };
 
-    fetchDashboardStats();
+    // Fetch recent activities from our new endpoint
+    const fetchRecentActivities = async () => {
+      try {
+        const response = await api.get('/clients/stats/recent-activities');
+        console.log(response)
+        setRecentActivities(response.data);
+        setActivitiesLoading(false);
+      } catch (err) {
+        console.error('Error fetching recent activities:', err);
+        setActivitiesLoading(false);
+      }
+    };
+
+    fetchDashboardStats().then();
+    fetchRecentActivities().then();
   }, []);
 
-  const formatCurrency = (amount: number): string => {
+  const formatCurrency = (amount: number | undefined) => {
+    if(!amount) return
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
     }).format(amount);
   };
 
-  const getStatusColor = (status: string): string => {
-    switch (status) {
-      case 'operational':
-        return 'bg-green-100 text-green-800';
-      case 'maintenance':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'degraded':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      return 'Hoje';
+    } else if (diffDays === 1) {
+      return 'Ontem';
+    } else {
+      return date.toLocaleDateString('pt-BR');
+    }
+  };
+
+  const getActivityStatusClass = (type: string, transactionType?: string): string => {
+    if (type === 'registration') {
+      return 'bg-green-100 text-green-800';
+    } else if (type === 'transaction') {
+      return transactionType === 'income' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800';
+    } else {
+      return 'bg-blue-100 text-blue-800';
     }
   };
 
@@ -86,34 +114,22 @@ const AdminDashboard: React.FC = () => {
           <div className="mb-6 bg-white overflow-hidden shadow rounded-lg border-t-4 border-orange-500">
             <div className="px-4 py-5 sm:p-6 flex justify-between items-center">
               <div>
-                <h3 className="text-lg leading-6 font-medium text-gray-900">Status do Sistema</h3>
-                <div className="mt-1 flex items-center">
-                  <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                      stats.systemStatus
-                    )}`}
-                  >
-                    {stats.systemStatus === 'operational' 
-                      ? 'Operacional' 
-                      : stats.systemStatus === 'maintenance' 
-                      ? 'Em Manutenção' 
-                      : 'Alguns serviços com problemas'}
-                  </span>
-                  <span className="ml-2 text-sm text-gray-500">
-                    {stats.systemStatus === 'operational' 
-                      ? 'Todos os sistemas funcionando normalmente' 
-                      : stats.systemStatus === 'maintenance' 
-                      ? 'Manutenção programada em andamento' 
-                      : 'Alguns serviços com problemas'}
-                  </span>
-                </div>
+                <h3 className="text-lg leading-6 font-medium text-gray-900">Acesso Rapido</h3>
               </div>
-              <Link 
-                to="/admin/settings" 
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 transition-colors duration-200"
-              >
-                Gerenciar Configurações
-              </Link>
+              <div className="space-x-2">
+                <Link
+                    to="/admin/clients/new"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 transition-colors duration-200"
+                >
+                  Adicionar Cliente
+                </Link>
+                <Link
+                    to="/admin/settings"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 transition-colors duration-200"
+                >
+                  Gerenciar Configurações
+                </Link>
+              </div>
             </div>
           </div>
         )}
@@ -136,20 +152,6 @@ const AdminDashboard: React.FC = () => {
               <div className="px-4 py-5 sm:p-6">
                 <dt className="text-sm font-medium text-gray-500 truncate">Clientes Ativos</dt>
                 <dd className="mt-1 text-3xl font-semibold text-gray-900">{stats?.activeClients}</dd>
-              </div>
-            </div>
-            <div className="bg-white overflow-hidden shadow rounded-lg border-t-4 border-orange-400 transition-all duration-300 hover:shadow-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <dt className="text-sm font-medium text-gray-500 truncate">Receita Total</dt>
-                <dd className="mt-1 text-3xl font-semibold text-orange-600">
-                  {formatCurrency(stats?.totalRevenue || 0)}
-                </dd>
-              </div>
-            </div>
-            <div className="bg-white overflow-hidden shadow rounded-lg border-t-4 border-orange-400 transition-all duration-300 hover:shadow-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <dt className="text-sm font-medium text-gray-500 truncate">Aprovações Pendentes</dt>
-                <dd className="mt-1 text-3xl font-semibold text-gray-900">{stats?.pendingApprovals}</dd>
               </div>
             </div>
           </div>
@@ -209,7 +211,7 @@ const AdminDashboard: React.FC = () => {
             </div>
           </Link>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="hidden bg-white overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0 bg-orange-400 rounded-md p-3">
@@ -236,58 +238,51 @@ const AdminDashboard: React.FC = () => {
         {/* Recent Activity */}
         <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">Atividades Recentes</h2>
         <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-          <ul className="divide-y divide-gray-200">
-            <li className="px-4 py-4 sm:px-6 hover:bg-orange-50 transition-colors duration-150">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-orange-600 truncate">Novo cliente registrado</p>
-                <div className="ml-2 flex-shrink-0 flex">
-                  <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Novo
-                  </p>
-                </div>
-              </div>
-              <div className="mt-2 sm:flex sm:justify-between">
-                <div className="sm:flex">
-                  <p className="flex items-center text-sm text-gray-500">
-                    Cliente #42 criou uma conta
-                  </p>
-                </div>
-                <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                  <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                  </svg>
-                  <p>
-                    <time dateTime="2020-09-20">Hoje</time>
-                  </p>
-                </div>
-              </div>
-            </li>
-            <li className="px-4 py-4 sm:px-6 hover:bg-orange-50 transition-colors duration-150">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-orange-600 truncate">Atualização do sistema concluída</p>
-                <div className="ml-2 flex-shrink-0 flex">
-                  <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Sucesso
-                  </p>
-                </div>
-              </div>
-              <div className="mt-2 sm:flex sm:justify-between">
-                <div className="sm:flex">
-                  <p className="flex items-center text-sm text-gray-500">
-                    Versão 2.1.0 implantada com sucesso
-                  </p>
-                </div>
-                <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                  <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                  </svg>
-                  <p>
-                    <time dateTime="2020-09-18">Ontem</time>
-                  </p>
-                </div>
-              </div>
-            </li>
-          </ul>
+          {activitiesLoading ? (
+            <div className="p-6 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+              <p className="mt-2 text-gray-600">Carregando atividades recentes...</p>
+            </div>
+          ) : recentActivities.length === 0 ? (
+            <div className="p-6 text-center">
+              <p className="text-gray-600">Nenhuma atividade recente encontrada.</p>
+            </div>
+          ) : (
+            <ul className="divide-y divide-gray-200">
+              {recentActivities.map((activity, index) => (
+                <li key={index} className="px-4 py-4 sm:px-6 hover:bg-orange-50 transition-colors duration-150">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-orange-600 truncate">
+                      {activity.description}
+                    </p>
+                    <div className="ml-2 flex-shrink-0 flex">
+                      <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getActivityStatusClass(activity.type, activity.transactionType)}`}>
+                        {formatCurrency(activity.amount)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-2 sm:flex sm:justify-between">
+                    <div className="sm:flex">
+                      <p className="flex items-center text-sm text-gray-500">
+                        {activity.client.name}
+                        {activity.type === 'transaction' && activity.amount && (
+                          <span className="ml-2 font-medium">{formatCurrency(activity.amount)}</span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                      <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                      </svg>
+                      <p>
+                        <time dateTime={activity.date}>{formatDate(activity.date)}</time>
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </Layout>

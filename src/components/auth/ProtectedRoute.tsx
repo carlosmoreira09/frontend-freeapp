@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  allowedAuthTypes = [AuthType.USER, AuthType.CLIENT, AuthType.ADMIN],
+  allowedAuthTypes = [AuthType.CLIENT, AuthType.ADMIN],
   adminOnly = false
 }) => {
   const { isAuthenticated, authType, loading } = useAuth();

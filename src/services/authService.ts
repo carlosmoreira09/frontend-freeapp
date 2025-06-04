@@ -20,7 +20,7 @@ const authService = {
       localStorage.setItem('authType', response.data.type);
       
       if (response.data.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('admin', JSON.stringify(response.data.user));
       } else if (response.data.client) {
         localStorage.setItem('client', JSON.stringify(response.data.client));
       }
@@ -39,15 +39,15 @@ const authService = {
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('authType');
-    localStorage.removeItem('user');
+    localStorage.removeItem('admin');
     localStorage.removeItem('client');
   },
 
   // Get current authenticated user/client
   getCurrentUser: () => {
     const authType = localStorage.getItem('authType');
-    if (authType === AuthType.USER) {
-      const userStr = localStorage.getItem('user');
+    if (authType === AuthType.ADMIN) {
+      const userStr = localStorage.getItem('admin');
       return userStr ? JSON.parse(userStr) : null;
     } else if (authType === AuthType.CLIENT) {
       const clientStr = localStorage.getItem('client');
