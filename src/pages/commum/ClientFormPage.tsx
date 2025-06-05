@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import Layout from '../../components/layout/Layout';
+import { useNavigate, useParams} from 'react-router-dom';
+import Layout from '../../components/layout/Layout.tsx';
 import { toast } from 'react-hot-toast';
-import { MaritalStatus } from '../../types';
+import { MaritalStatus} from '../../types';
 import {adminService} from "../../services";
+import {useAuth} from "../../contexts/AuthContext.tsx";
 
 const ClientFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { authType } = useAuth();
   const isEditMode = !!id;
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -145,13 +146,7 @@ const ClientFormPage: React.FC = () => {
       } else {
         await adminService.createClient(clientData);
       }
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Show success message
       toast.success(isEditMode ? 'Cliente atualizado com sucesso!' : 'Cliente criado com sucesso!');
-      
       // Redirect back to clients list
       navigate('/admin/clients');
     } catch (error) {
@@ -219,8 +214,13 @@ const ClientFormPage: React.FC = () => {
 
   // Handle cancel
   const handleCancel = () => {
-    navigate('/admin/clients');
+    if(authType === 'admin') {
+      navigate('/admin/clients');
+    } else {
+      navigate('/client/profile')
+    }
   };
+
 
   if (loading) {
     return (

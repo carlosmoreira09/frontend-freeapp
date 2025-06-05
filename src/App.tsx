@@ -9,7 +9,7 @@ import ClientTransactions from './pages/client/ClientTransactions'
 import AddTransaction from './pages/client/AddTransaction'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminClients from './pages/admin/AdminClients'
-import ClientFormPage from './pages/admin/ClientFormPage'
+import ClientFormPage from './pages/commum/ClientFormPage.tsx'
 import AdminSettings from './pages/admin/AdminSettings'
 import AdminDailyTransactions from './pages/admin/AdminDailyTransactions'
 import ProtectedRoute from './components/auth/ProtectedRoute'
@@ -36,6 +36,8 @@ function App() {
             <Route path="/client/profile" element={<ClientProfile />} />
             <Route path="/client/transactions" element={<ClientTransactions />} />
             <Route path="/client/add-transaction" element={<AddTransaction />} />
+            <Route path="/client/edit/:id" element={<ClientFormPage />} />
+
           </Route>
           
           {/* Protected admin routes */}

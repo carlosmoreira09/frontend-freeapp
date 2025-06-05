@@ -1,86 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import ClientLayout from '../../components/layout/ClientLayout';
 import { Link } from 'react-router-dom';
+import {api, type DailyTransaction} from "../../services";
+import {toast} from "react-hot-toast";
+import {useAuth} from "../../contexts/AuthContext.tsx";
 
-// Mock transaction data
-interface Transaction {
-  id: string;
-  date: string;
-  description: string;
-  amount: number;
-  type: 'credit' | 'debit';
-  status: 'completed' | 'pending' | 'failed';
-}
-
-const mockTransactions: Transaction[] = [
-  {
-    id: '1',
-    date: '2023-05-15',
-    description: 'Assinatura Mensal',
-    amount: 29.99,
-    type: 'debit',
-    status: 'completed',
-  },
-  {
-    id: '2',
-    date: '2023-05-10',
-    description: 'Reembolso',
-    amount: 15.00,
-    type: 'credit',
-    status: 'completed',
-  },
-  {
-    id: '3',
-    date: '2023-05-05',
-    description: 'Taxa de Serviço',
-    amount: 5.99,
-    type: 'debit',
-    status: 'completed',
-  },
-  {
-    id: '4',
-    date: '2023-04-28',
-    description: 'Recurso Premium',
-    amount: 9.99,
-    type: 'debit',
-    status: 'pending',
-  },
-  {
-    id: '5',
-    date: '2023-04-20',
-    description: 'Crédito Bônus',
-    amount: 10.00,
-    type: 'credit',
-    status: 'completed',
-  },
-];
 
 const ClientTransactions: React.FC = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { client } = useAuth();
   const [error, setError] = useState<string | null>(null);
-
+  const [recentActivities, setRecentActivities] = useState<DailyTransaction[]>([]);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    // Simulate API call to fetch transactions
-    const fetchTransactions = async () => {
+    // Fetch dashboard stats from API
+    const fetchDashboardStats = async () => {
       try {
-        // In a real app, you would fetch from an API
-        // const response = await api.get('/transactions');
-        // setTransactions(response.data);
-        
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setTransactions(mockTransactions);
-        setLoading(false);
+        setLoading(true);
+        // Get transactions from API
+        const response = await api.get(`/daily-transactions/client/${client?.id}`);
+        if(response.data) {
+          const transactions: DailyTransaction[] = response.data.transactions || [];
+          setRecentActivities(transactions)
+        } else  {
+          toast.error('Erro ao carregar transações do cliente.');
+
+        }
       } catch (err) {
-        console.error('Erro ao buscar transações:', err);
-        setError('Falha ao carregar transações. Por favor, tente novamente mais tarde.');
+        setError(err as string)
+        toast.error('Erro ao carregar transações do cliente: ' + err);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchTransactions();
-  }, []);
+    fetchDashboardStats().then();
+  }, [client?.id]);
 
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('pt-BR', {
@@ -193,19 +147,19 @@ const ClientTransactions: React.FC = () => {
                       scope="col"
                       className="px-6 py-3 text-left text-xs font-medium text-orange-800 uppercase tracking-wider hidden sm:table-cell"
                     >
-                      Status
+                      Categoria
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {transactions.length === 0 ? (
+                  {recentActivities.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
                         Nenhuma transação encontrada.
                       </td>
                     </tr>
                   ) : (
-                    transactions.map((transaction) => (
+                      recentActivities.map((transaction) => (
                       <tr key={transaction.id} className="hover:bg-orange-50 transition-colors duration-150">
                         <td className="px-2 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                           {new Date(transaction.date).toLocaleDateString('pt-BR')}
@@ -215,18 +169,18 @@ const ClientTransactions: React.FC = () => {
                         </td>
                         <td className="px-2 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
                           <span
-                            className={`${transaction.type === 'credit' ? 'text-green-600' : 'text-red-600'}`}
+                            className={`${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}`}
                           >
-                            {transaction.type === 'credit' ? '+' : '-'} {formatCurrency(transaction.amount)}
+                            {transaction.type === 'expense' ? '+' : '-'} {formatCurrency(transaction.amount)}
                           </span>
                         </td>
                         <td className="px-2 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden sm:table-cell">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                              transaction.status
+                              transaction.category
                             )}`}
                           >
-                            {getStatusText(transaction.status)}
+                            {getStatusText(transaction.category.name)}
                           </span>
                         </td>
                       </tr>
@@ -239,7 +193,7 @@ const ClientTransactions: React.FC = () => {
         </div>
 
         {/* Transaction Summary */}
-        {!loading && !error && transactions.length > 0 && (
+        {!loading && !error && recentActivities.length > 0 && (
           <div className="mt-6 bg-white shadow overflow-hidden sm:rounded-lg border-l-4 border-orange-400">
             <div className="px-4 py-5 sm:p-6">
               <h3 className="text-lg leading-6 font-medium text-gray-900">Resumo de Transações</h3>
@@ -248,8 +202,8 @@ const ClientTransactions: React.FC = () => {
                   <div className="text-sm font-medium text-orange-700">Total de Créditos</div>
                   <div className="mt-1 text-2xl font-semibold text-green-600">
                     {formatCurrency(
-                      transactions
-                        .filter(t => t.type === 'credit')
+                        recentActivities
+                        .filter(t => t.type === 'income')
                         .reduce((sum, t) => sum + t.amount, 0)
                     )}
                   </div>
@@ -258,8 +212,8 @@ const ClientTransactions: React.FC = () => {
                   <div className="text-sm font-medium text-orange-700">Total de Débitos</div>
                   <div className="mt-1 text-2xl font-semibold text-red-600">
                     {formatCurrency(
-                      transactions
-                        .filter(t => t.type === 'debit')
+                        recentActivities
+                        .filter(t => t.type === 'expense')
                         .reduce((sum, t) => sum + t.amount, 0)
                     )}
                   </div>

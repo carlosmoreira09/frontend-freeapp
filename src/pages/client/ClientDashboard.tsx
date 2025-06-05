@@ -2,69 +2,65 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import ClientLayout from '../../components/layout/ClientLayout';
-import type {RecentActivity} from "../admin/AdminDashboard.tsx";
-import {api} from "../../services";
-import {formatDate, getActivityStatusClass} from "../../lib/utils.ts";
+import {api, type DailyTransaction} from "../../services";
+import {toast} from "react-hot-toast";
 
-// Mock data for dashboard stats
 interface DashboardStats {
   totalTransactions: number;
-  pendingTransactions: number;
-  accountBalance: number;
+  totalIncome: number;
+  totalExpense: number;
   lastLoginDate: string;
 }
 
 const ClientDashboard: React.FC = () => {
   const { client } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
+  const [recentActivities, setRecentActivities] = useState<DailyTransaction[]>([]);
   const [activitiesLoading, setActivitiesLoading] = useState(true);
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API call to fetch dashboard stats
+    // Fetch dashboard stats from API
     const fetchDashboardStats = async () => {
       try {
-        // In a real app, you would fetch from an API
-        // const response = await api.get('/client/stats');
-        // setStats(response.data);
-        
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock data
-        setStats({
-          totalTransactions: 12,
-          pendingTransactions: 2,
-          accountBalance: 1250.75,
-          lastLoginDate: new Date().toISOString(),
-        });
-        setLoading(false);
-      } catch (err) {
-        console.error('Erro ao buscar estatísticas do painel:', err);
-        setLoading(false);
-      }
-    };
-
-    fetchDashboardStats();
-  }, []);
-
-  useEffect(() => {
-    const fetchRecentActivities = async () => {
-      try {
-        setActivitiesLoading(true);
+        setLoading(true);
+        setActivitiesLoading(true)
+        // Get transactions from API
         const response = await api.get(`/daily-transactions/client/${client?.id}`);
-        console.log(response)
-        setRecentActivities(response.data.transactions);
+        if(response.data) {
+          const transactions: DailyTransaction[] = response.data.transactions || [];
+          setRecentActivities(transactions.slice(0,5))
+          // Calculate stats from transactions
+          let totalIncome = 0;
+          let totalExpense = 0;
+
+          transactions.forEach((transaction: DailyTransaction) => {
+            if (transaction.type === 'income') {
+              totalIncome += Number(transaction.amount);
+            } else if (transaction.type === 'expense') {
+              totalExpense += Number(transaction.amount);
+            }
+          });
+
+          setStats({
+            totalTransactions: transactions.length,
+            totalIncome,
+            totalExpense,
+            lastLoginDate: new Date().toISOString(),
+          });
+        }
       } catch (err) {
-        console.error('Error fetching recent activities:', err);
+        toast.error('Erro ao buscar estatísticas do painel: ' + err);
       } finally {
-        setActivitiesLoading(false);
+        setLoading(false);
+        setActivitiesLoading(false)
       }
     };
-    fetchRecentActivities().then();
-  }, []);
+
+    fetchDashboardStats().then();
+  }, [client?.id]);
+
+
   const formatCurrency = (amount: number | undefined): string => {
     if(!amount)  return ''
       return new Intl.NumberFormat('pt-BR', {
@@ -93,34 +89,26 @@ const ClientDashboard: React.FC = () => {
             <p className="mt-4 text-gray-600">Carregando seu painel...</p>
           </div>
         ) : (
-          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
-            <div className="bg-white overflow-hidden shadow rounded-lg border-t-4 border-orange-400 transition-all duration-300 hover:shadow-lg">
-              <div className="px-4 py-5 sm:p-6">
-                <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">Saldo da Conta</dt>
-                <dd className="mt-1 text-xl sm:text-3xl font-semibold text-orange-600">
-                  {formatCurrency(stats?.accountBalance || 0)}
-                </dd>
-              </div>
-            </div>
+          <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
             <div className="bg-white overflow-hidden shadow rounded-lg border-t-4 border-orange-400 transition-all duration-300 hover:shadow-lg">
               <div className="px-4 py-5 sm:p-6">
                 <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">Total de Transações</dt>
                 <dd className="mt-1 text-xl sm:text-3xl font-semibold text-gray-900">{stats?.totalTransactions}</dd>
               </div>
             </div>
-            <div className="bg-white overflow-hidden shadow rounded-lg border-t-4 border-orange-400 transition-all duration-300 hover:shadow-lg">
+            <div className="bg-white overflow-hidden shadow rounded-lg border-t-4 border-green-500 transition-all duration-300 hover:shadow-lg">
               <div className="px-4 py-5 sm:p-6">
-                <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">Transações Pendentes</dt>
-                <dd className="mt-1 text-xl sm:text-3xl font-semibold text-gray-900">{stats?.pendingTransactions}</dd>
+                <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">Total de Receitas</dt>
+                <dd className="mt-1 text-xl sm:text-3xl font-semibold text-green-600">
+                  {formatCurrency(stats?.totalIncome) || 'R$ 0,00'}
+                </dd>
               </div>
             </div>
-            <div className="bg-white overflow-hidden shadow rounded-lg border-t-4 border-orange-400 transition-all duration-300 hover:shadow-lg">
+            <div className="bg-white overflow-hidden shadow rounded-lg border-t-4 border-red-500 transition-all duration-300 hover:shadow-lg">
               <div className="px-4 py-5 sm:p-6">
-                <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">Status da Conta</dt>
-                <dd className="mt-1 text-xl sm:text-3xl font-semibold text-gray-900">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Ativa
-                  </span>
+                <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate">Total de Despesas</dt>
+                <dd className="mt-1 text-xl sm:text-3xl font-semibold text-red-600">
+                  {formatCurrency(stats?.totalExpense || 0)}
                 </dd>
               </div>
             </div>
@@ -207,52 +195,74 @@ const ClientDashboard: React.FC = () => {
         </div>
 
         {/* Recent Activity */}
-        <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">Atividades Recentes</h2>
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div className="mt-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Atividade Recente</h2>
           {activitiesLoading ? (
-              <div className="p-6 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
-                <p className="mt-2 text-gray-600">Carregando atividades recentes...</p>
-              </div>
-          ) : recentActivities.length === 0 ? (
-              <div className="p-6 text-center">
-                <p className="text-gray-600">Nenhuma atividade recente encontrada.</p>
-              </div>
-          ) : (
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+              <p className="mt-2 text-gray-600">Carregando atividades recentes...</p>
+            </div>
+          ) : recentActivities.length > 0 ? (
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg">
               <ul className="divide-y divide-gray-200">
-                {recentActivities.map((activity, index) => (
-                    <li key={index} className="px-4 py-4 sm:px-6 hover:bg-orange-50 transition-colors duration-150">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-orange-600 truncate">
-                          {activity.description}
-                        </p>
-                        <div className="ml-2 flex-shrink-0 flex">
-                          <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getActivityStatusClass(activity.type, activity.transactionType)}`}>
-                            {formatCurrency(activity.amount)}
-                          </p>
+                {recentActivities.slice(0, 5).map((activity: any) => (
+                  <li key={activity.id} className="px-4 py-4 sm:px-6 hover:bg-orange-50 transition-colors duration-150">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className={`flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center ${
+                          activity.type === 'income' ? 'bg-green-100' : 'bg-red-100'
+                        }`}>
+                          {activity.type === 'income' ? (
+                            <svg className="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                          ) : (
+                            <svg className="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                          )}
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{activity.description}</div>
+                          <div className="text-sm text-gray-500">
+                            {new Date(activity.date).toLocaleDateString('pt-BR')} • {activity.category?.name || 'Sem categoria'}
+                          </div>
                         </div>
                       </div>
-                      <div className="mt-2 sm:flex sm:justify-between">
-                        <div className="sm:flex">
-                          <p className="flex items-center text-sm text-gray-500">
-                            {activity.client.name}
-                            {activity.type === 'transaction' && activity.amount && (
-                                <span className="ml-2 font-medium">{formatCurrency(activity.amount)}</span>
-                            )}
-                          </p>
-                        </div>
-                        <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                          <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                          </svg>
-                          <p>
-                            <time dateTime={activity.date}>{formatDate(activity.date)}</time>
-                          </p>
-                        </div>
+                      <div className="ml-2 flex-shrink-0 flex">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          activity.type === 'income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {formatCurrency(activity.amount)}
+                        </span>
                       </div>
-                    </li>
+                    </div>
+                  </li>
                 ))}
               </ul>
+              <div className="bg-gray-50 px-4 py-4 sm:px-6">
+                <div className="flex justify-center">
+                  <Link 
+                    to="/client/transactions" 
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                  >
+                    Ver todas as transações
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6 text-center">
+              <p className="text-gray-600">Nenhuma transação recente encontrada.</p>
+              <div className="mt-4">
+                <Link 
+                  to="/client/transactions" 
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
+                >
+                  Gerenciar transações
+                </Link>
+              </div>
+            </div>
           )}
         </div>
       </div>

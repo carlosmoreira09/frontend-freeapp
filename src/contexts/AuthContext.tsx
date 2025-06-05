@@ -1,18 +1,17 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import authService from "../services/authService.ts";
-import { AuthType, type Client, type User } from "../types";
+import {type AdminClientData, AuthType, type Client, type User} from "../types";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-  client: Client | null;
+  client: Client | null | AdminClientData;
   authType: AuthType | null;
   loading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   clearError: () => void;
-  updateClientProfile: (profileData: Partial<Client>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -112,35 +111,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
   };
 
-  const updateClientProfile = async (profileData: Partial<Client>) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // This would call the actual API endpoint to update the profile
-      // const updatedClient = await authService.updateProfile(profileData);
-      
-      // For now, just simulate an API call and update the local state
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (client) {
-        const updatedClient = { ...client, ...profileData };
-        setClient(updatedClient);
-        
-        // Update localStorage
-        localStorage.setItem('client', JSON.stringify(updatedClient));
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred while updating profile');
-      }
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const value = {
     isAuthenticated,
@@ -152,7 +122,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     clearError,
-    updateClientProfile
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
