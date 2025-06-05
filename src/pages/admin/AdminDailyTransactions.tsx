@@ -6,7 +6,8 @@ import TransactionTable from '../../components/transactions/TransactionTable';
 import TransactionSummaryCards from '../../components/transactions/TransactionSummaryCards';
 import TransactionCharts from '../../components/transactions/TransactionCharts';
 import { dailyTransactionService, adminService } from '../../services';
-import type { DailyTransaction, TransactionType, TransactionSummary, AdminClientData } from '../../types';
+import type { DailyTransaction, TransactionSummary, AdminClientData } from '../../types';
+import { TransactionType } from '../../types';
 import { UserCircleIcon, PhoneIcon, EnvelopeIcon, MapPinIcon, CreditCardIcon, CalendarIcon } from '@heroicons/react/24/outline';
 
 function classNames(...classes: string[]) {
@@ -193,14 +194,15 @@ const AdminDailyTransactions: React.FC = () => {
   // Calculate summary from filtered transactions
   useEffect(() => {
     setSummaryLoading(true);
-    
     const calculateSummary = () => {
       const summaryData = filteredTransactions.reduce(
         (acc, transaction) => {
-          if (transaction.type === 'income') {
-            acc.income += transaction.amount;
-          } else if (transaction.type === 'expense') {
-            acc.expense += transaction.amount;
+          // Convert amount to number to ensure proper addition
+          const amount = Number(transaction.amount);
+          if (transaction.type == TransactionType.INCOME) {
+            acc.income += amount;
+          } else if (transaction.type == TransactionType.EXPENSE) {
+            acc.expense += amount;
           }
           return acc;
         },
@@ -208,8 +210,6 @@ const AdminDailyTransactions: React.FC = () => {
       );
       
       // Calculate balance
-      summaryData.balance = Number(summaryData.income - summaryData.expense);
-      
       setSummary(summaryData);
       setSummaryLoading(false);
     };

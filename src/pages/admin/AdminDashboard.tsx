@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import Layout from '../../components/layout/Layout';
 import {api} from "../../services";
+import {formatCurrency, formatDate, getActivityStatusClass} from "../../lib/utils.ts";
 
 // Dashboard stats interface
 interface DashboardStats {
@@ -15,7 +16,7 @@ interface DashboardStats {
 }
 
 // Recent activity interface
-interface RecentActivity {
+export interface RecentActivity {
   type: 'transaction' | 'registration' | 'system';
   clientId?: string;
   clientName?: string;
@@ -49,9 +50,9 @@ const AdminDashboard: React.FC = () => {
     // Fetch recent activities from our new endpoint
     const fetchRecentActivities = async () => {
       try {
+        setActivitiesLoading(true);
         const response = await api.get('/clients/stats/recent-activities');
         setRecentActivities(response.data);
-        setActivitiesLoading(false);
       } catch (err) {
         console.error('Error fetching recent activities:', err);
         setActivitiesLoading(false);
@@ -62,37 +63,6 @@ const AdminDashboard: React.FC = () => {
     fetchRecentActivities().then();
   }, []);
 
-  const formatCurrency = (amount: number | undefined) => {
-    if(!amount) return
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(amount);
-  };
-
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) {
-      return 'Hoje';
-    } else if (diffDays === 1) {
-      return 'Ontem';
-    } else {
-      return date.toLocaleDateString('pt-BR');
-    }
-  };
-
-  const getActivityStatusClass = (type: string, transactionType?: string): string => {
-    if (type === 'registration') {
-      return 'bg-green-100 text-green-800';
-    } else if (type === 'transaction') {
-      return transactionType === 'income' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800';
-    } else {
-      return 'bg-blue-100 text-blue-800';
-    }
-  };
 
   return (
     <Layout>
@@ -194,7 +164,7 @@ const AdminDashboard: React.FC = () => {
                   </div>
                   <div className="ml-5">
                     <h3 className="text-lg font-medium text-gray-900">Transações Diárias</h3>
-                    <p className="mt-1 text-sm text-gray-500">Visualizar e analisar transações dos clientes</p>
+                    <p className="mt-1 text-sm text-gray-500">Visualizar e analisar transações</p>
                   </div>
                 </div>
               </div>

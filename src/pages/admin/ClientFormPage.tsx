@@ -125,6 +125,7 @@ const ClientFormPage: React.FC = () => {
     e.preventDefault();
     
     if (!validateForm()) {
+      toast.error("Verifique seu formulário")
       return;
     }
     
@@ -503,52 +504,6 @@ const ClientFormPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Password - only show for new clients or when editing */}
-                <div className="sm:col-span-3">
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                    {isEditMode ? 'Nova Senha' : 'Senha *'}
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="password"
-                      name="password"
-                      id="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      className={`shadow-sm focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm border-gray-300 rounded-md ${
-                        errors.password ? 'border-red-300' : ''
-                      }`}
-                    />
-                    {errors.password && (
-                      <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-                    )}
-                    {isEditMode && (
-                      <p className="mt-1 text-xs text-gray-500">Deixe em branco para manter a senha atual</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Confirm Password */}
-                <div className="sm:col-span-3">
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                    Confirmar Senha
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      id="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      className={`shadow-sm focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm border-gray-300 rounded-md ${
-                        errors.confirmPassword ? 'border-red-300' : ''
-                      }`}
-                    />
-                    {errors.confirmPassword && (
-                      <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
-                    )}
-                  </div>
-                </div>
 
                 {/* Active Status - only show when editing */}
                 {isEditMode && (

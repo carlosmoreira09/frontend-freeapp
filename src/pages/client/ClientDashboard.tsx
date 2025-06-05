@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import ClientLayout from '../../components/layout/ClientLayout';
+import type {RecentActivity} from "../admin/AdminDashboard.tsx";
+import {api} from "../../services";
+import {formatDate, getActivityStatusClass} from "../../lib/utils.ts";
 
 // Mock data for dashboard stats
 interface DashboardStats {
@@ -14,6 +17,9 @@ interface DashboardStats {
 const ClientDashboard: React.FC = () => {
   const { client } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
+  const [activitiesLoading, setActivitiesLoading] = useState(true);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,8 +50,24 @@ const ClientDashboard: React.FC = () => {
     fetchDashboardStats();
   }, []);
 
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('pt-BR', {
+  useEffect(() => {
+    const fetchRecentActivities = async () => {
+      try {
+        setActivitiesLoading(true);
+        const response = await api.get(`/daily-transactions/client/${client?.id}`);
+        console.log(response)
+        setRecentActivities(response.data.transactions);
+      } catch (err) {
+        console.error('Error fetching recent activities:', err);
+      } finally {
+        setActivitiesLoading(false);
+      }
+    };
+    fetchRecentActivities().then();
+  }, []);
+  const formatCurrency = (amount: number | undefined): string => {
+    if(!amount)  return ''
+      return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
     }).format(amount);
@@ -185,76 +207,53 @@ const ClientDashboard: React.FC = () => {
         </div>
 
         {/* Recent Activity */}
-        <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">Atividade Recente</h2>
+        <h2 className="text-xl font-bold text-gray-900 mt-8 mb-4">Atividades Recentes</h2>
         <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-          <ul className="divide-y divide-gray-200">
-            <li className="px-4 py-4 sm:px-6 hover:bg-orange-50 transition-colors duration-150">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-orange-600 truncate">Perfil atualizado</p>
-                <div className="ml-2 flex-shrink-0 flex">
-                  <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Concluído
-                  </p>
-                </div>
+          {activitiesLoading ? (
+              <div className="p-6 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+                <p className="mt-2 text-gray-600">Carregando atividades recentes...</p>
               </div>
-              <div className="mt-2 sm:flex sm:justify-between">
-                <div className="sm:flex">
-                  <p className="flex items-center text-sm text-gray-500">
-                    Você atualizou suas informações de perfil
-                  </p>
-                </div>
-                <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                  <p>
-                    {new Date().toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
+          ) : recentActivities.length === 0 ? (
+              <div className="p-6 text-center">
+                <p className="text-gray-600">Nenhuma atividade recente encontrada.</p>
               </div>
-            </li>
-            <li className="px-4 py-4 sm:px-6 hover:bg-orange-50 transition-colors duration-150">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-orange-600 truncate">Transação recebida</p>
-                <div className="ml-2 flex-shrink-0 flex">
-                  <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Concluído
-                  </p>
-                </div>
-              </div>
-              <div className="mt-2 sm:flex sm:justify-between">
-                <div className="sm:flex">
-                  <p className="flex items-center text-sm text-gray-500">
-                    Você recebeu {formatCurrency(350.00)} de João Silva
-                  </p>
-                </div>
-                <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                  <p>
-                    {new Date(Date.now() - 86400000).toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
-              </div>
-            </li>
-            <li className="px-4 py-4 sm:px-6 hover:bg-orange-50 transition-colors duration-150">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-orange-600 truncate">Login detectado</p>
-                <div className="ml-2 flex-shrink-0 flex">
-                  <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                    Informativo
-                  </p>
-                </div>
-              </div>
-              <div className="mt-2 sm:flex sm:justify-between">
-                <div className="sm:flex">
-                  <p className="flex items-center text-sm text-gray-500">
-                    Novo login detectado em um dispositivo desconhecido
-                  </p>
-                </div>
-                <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                  <p>
-                    {new Date(Date.now() - 172800000).toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
-              </div>
-            </li>
-          </ul>
+          ) : (
+              <ul className="divide-y divide-gray-200">
+                {recentActivities.map((activity, index) => (
+                    <li key={index} className="px-4 py-4 sm:px-6 hover:bg-orange-50 transition-colors duration-150">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-orange-600 truncate">
+                          {activity.description}
+                        </p>
+                        <div className="ml-2 flex-shrink-0 flex">
+                          <p className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getActivityStatusClass(activity.type, activity.transactionType)}`}>
+                            {formatCurrency(activity.amount)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-2 sm:flex sm:justify-between">
+                        <div className="sm:flex">
+                          <p className="flex items-center text-sm text-gray-500">
+                            {activity.client.name}
+                            {activity.type === 'transaction' && activity.amount && (
+                                <span className="ml-2 font-medium">{formatCurrency(activity.amount)}</span>
+                            )}
+                          </p>
+                        </div>
+                        <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                          <svg className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                          </svg>
+                          <p>
+                            <time dateTime={activity.date}>{formatDate(activity.date)}</time>
+                          </p>
+                        </div>
+                      </div>
+                    </li>
+                ))}
+              </ul>
+          )}
         </div>
       </div>
     </ClientLayout>

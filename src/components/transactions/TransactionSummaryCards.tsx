@@ -58,7 +58,7 @@ const TransactionSummaryCards: React.FC<TransactionSummaryCardsProps> = ({ summa
                   <div className="animate-pulse h-6 w-24 bg-gray-200 rounded"></div>
                 </dd>
               ) : (
-                <dd className="text-lg font-medium text-gray-900">{Number(formatCurrency(summary.expense)) ? formatCurrency(summary.expense) : formatCurrency(0)}</dd>
+                <dd className="text-lg font-medium text-gray-900">{formatCurrency(summary.expense)}</dd>
               )}
             </div>
           </div>
@@ -81,8 +81,8 @@ const TransactionSummaryCards: React.FC<TransactionSummaryCardsProps> = ({ summa
                   <div className="animate-pulse h-6 w-24 bg-gray-200 rounded"></div>
                 </dd>
               ) : (
-                <dd className={`text-lg font-medium ${summary.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {Number(formatCurrency(summary.balance)) ? formatCurrency(summary.balance) : formatCurrency(0)}
+                <dd className={`text-lg font-medium ${Number(formatCurrency((summary.income - summary.expense))) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {formatCurrency((summary.income - summary.expense))}
                 </dd>
               )}
             </div>

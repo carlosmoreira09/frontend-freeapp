@@ -10,7 +10,6 @@ const AdminClients: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(100);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
@@ -19,7 +18,7 @@ const AdminClients: React.FC = () => {
   // Load clients from API
   useEffect(() => {
     fetchClients().then();
-  }, [page, limit, statusFilter]);
+  }, [page, limit]);
 
   // Fetch clients from API
   const fetchClients = async () => {
@@ -29,7 +28,7 @@ const AdminClients: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await adminService.getClients(page, limit, searchTerm, statusFilter !== 'all' ? statusFilter : '');
+      const response = await adminService.getClients(page, limit, searchTerm);
       if(response && response.clients) {
         setClients(response.clients);
       }
@@ -68,33 +67,14 @@ const AdminClients: React.FC = () => {
     }
   };
 
-  // Get status color
-  const getStatusColor = (status: string): string => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800';
-      case 'inactive':
-        return 'bg-red-100 text-red-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'suspended':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   // Get status label
-  const getStatusLabel = (status: string): string => {
+  const getStatusLabel = (status: boolean | undefined): string => {
+    if(status === undefined) return 'Inativo'
     switch (status) {
-      case 'active':
+      case true:
         return 'Ativo';
-      case 'inactive':
+      case false:
         return 'Inativo';
-      case 'pending':
-        return 'Pendente';
-      case 'suspended':
-        return 'Suspenso';
       default:
         return status;
     }
@@ -102,12 +82,8 @@ const AdminClients: React.FC = () => {
 
   // Filter clients based on search term and status
   const filteredClients = clients.filter(client => {
-    const matchesSearch = client.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    return client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          client.email.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus = statusFilter === 'all' || client.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
   });
 
   return (
@@ -141,22 +117,6 @@ const AdminClients: React.FC = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-              </div>
-
-              <div className="w-full md:w-auto">
-                <label htmlFor="status" className="sr-only">Status</label>
-                <select
-                  id="status"
-                  name="status"
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-orange-500 focus:border-orange-500 sm:text-sm rounded-md"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="all">Todos os Status</option>
-                  <option value="active">Ativo</option>
-                  <option value="inactive">Inativo</option>
-                  <option value="pending">Pendente</option>
-                </select>
               </div>
 
               <div className="w-full md:w-auto">
@@ -259,11 +219,9 @@ const AdminClients: React.FC = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span
-                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                                client.status
-                              )}`}
+                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full`}
                             >
-                              {getStatusLabel(client.status)}
+                              {getStatusLabel(client.isActive)}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -274,7 +232,7 @@ const AdminClients: React.FC = () => {
                               Editar
                             </button>
                             <button 
-                              className="text-red-600 hover:text-red-900"
+                              className="hidden text-red-600 hover:text-red-900"
                               onClick={() => handleDeleteClient(client.id)}
                               disabled={isDeleting === client.id}
                             >

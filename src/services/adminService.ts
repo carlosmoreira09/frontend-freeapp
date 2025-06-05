@@ -19,6 +19,7 @@ const adminService = {
 
   // Create new client
   createClient: async (client: Omit<AdminClientData, 'id' | 'createdAt' | 'status'>): Promise<AdminClientData> => {
+    // Use the /clients endpoint which expects the userId from the JWT token
     const response = await api.post<AdminClientData>('/clients', client);
     return response.data;
   },
