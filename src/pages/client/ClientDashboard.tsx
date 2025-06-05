@@ -20,17 +20,14 @@ const ClientDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch dashboard stats from API
     const fetchDashboardStats = async () => {
       try {
         setLoading(true);
         setActivitiesLoading(true)
-        // Get transactions from API
         const response = await api.get(`/daily-transactions/client/${client?.id}`);
         if(response.data) {
           const transactions: DailyTransaction[] = response.data.transactions || [];
           setRecentActivities(transactions.slice(0,5))
-          // Calculate stats from transactions
           let totalIncome = 0;
           let totalExpense = 0;
 

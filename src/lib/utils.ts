@@ -6,11 +6,17 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const formatCurrency = (amount: number | undefined) => {
-  if(!amount) return
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(amount);
+  if(!amount) {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(0);
+  } else {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(amount);
+  }
 };
 
 export const formatDate = (dateString: string): string => {

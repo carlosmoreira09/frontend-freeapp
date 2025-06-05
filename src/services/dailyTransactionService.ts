@@ -3,24 +3,7 @@ import type {DailyTransaction, DailyTransactionFilters} from '../types';
 
 // Daily Transaction service
 const dailyTransactionService = {
-  // Get all daily transactions (admin only)
-  getAllTransactionsWithFilters: async (
-    page = 1, 
-    limit = 10, 
-    filters: DailyTransactionFilters = {}
-  ): Promise<{ transactions: DailyTransaction[], pagination: any }> => {
-    const { clientId, startDate, endDate, type } = filters;
-    
-    let url = `/daily-transactions?page=${page}&limit=${limit}`;
-    
-    if (clientId) url += `&clientId=${clientId}`;
-    if (startDate) url += `&startDate=${startDate}`;
-    if (endDate) url += `&endDate=${endDate}`;
-    if (type) url += `&type=${type}`;
-    
-    const response = await api.get(url);
-    return response.data;
-  },
+
 
   getAllDailyTransactions: async () => {
     const response = await api.get(`/daily-transactions`)
@@ -44,6 +27,11 @@ const dailyTransactionService = {
     
     const response = await api.get(url);
     return response.data;
+  },
+
+  createDailyTransaction: async (data: DailyTransaction) => {
+    const response = await api.post(`/daily-transactions`, data)
+    return response.data
   },
 
   // Get daily transactions for a specific date range

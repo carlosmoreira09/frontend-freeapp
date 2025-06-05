@@ -15,7 +15,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { isAuthenticated, authType, loading } = useAuth();
   const location = useLocation();
 
-  // Show loading state if still checking authentication
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-orange-50">
@@ -23,18 +22,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       </div>
     );
   }
-
-  // If admin-only route and not admin, redirect
   if (adminOnly && authType !== AuthType.ADMIN) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If not authenticated, redirect to login
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If authenticated but wrong type, redirect to appropriate dashboard
   if (authType && !allowedAuthTypes.includes(authType)) {
     if (authType === AuthType.ADMIN) {
       return <Navigate to="/admin/dashboard" replace />;
@@ -45,7 +40,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
   }
 
-  // If authenticated and correct type, render the child routes
   return <Outlet />;
 };
 

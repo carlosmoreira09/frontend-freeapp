@@ -34,15 +34,11 @@ const ClientFormPage: React.FC = () => {
   });
   
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  // Load client data if in edit mode
   useEffect(() => {
     if (isEditMode) {
       fetchClient();
     }
   }, [id]);
-
-  // Fetch client data
   const fetchClient = async () => {
     if (!id) return;
     
@@ -50,7 +46,6 @@ const ClientFormPage: React.FC = () => {
       setLoading(true);
       const response = await adminService.getClient(id);
       if(response) {
-      // Update form data
       setFormData({
         ...formData,
         name: response.name,
@@ -81,7 +76,6 @@ const ClientFormPage: React.FC = () => {
     }
   };
 
-  // Form validation
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
@@ -121,7 +115,6 @@ const ClientFormPage: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -132,22 +125,17 @@ const ClientFormPage: React.FC = () => {
     
     try {
       setSubmitting(true);
-      
-      // Prepare data for submission
       const clientData = {
         ...formData,
         age: formData.age ? parseInt(formData.age) : undefined,
         salary: formData.salary ? parseFloat(formData.salary) : undefined
       };
-      
-      // In a real app, you would call the API
       if (isEditMode) {
          await adminService.updateClient(id, clientData);
       } else {
         await adminService.createClient(clientData);
       }
       toast.success(isEditMode ? 'Cliente atualizado com sucesso!' : 'Cliente criado com sucesso!');
-      // Redirect back to clients list
       navigate('/admin/clients');
     } catch (error) {
       console.error('Error submitting client form:', error);
@@ -157,18 +145,14 @@ const ClientFormPage: React.FC = () => {
     }
   };
 
-  // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     
-    // Handle checkbox inputs
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData(prev => ({ ...prev, [name]: checked }));
       return;
     }
-    
-    // Format CPF input
     if (name === 'cpf') {
       const digits = value.replace(/\D/g, '');
       if (digits.length <= 11) {
@@ -183,8 +167,6 @@ const ClientFormPage: React.FC = () => {
       }
       return;
     }
-    
-    // Format phone input
     if (name === 'phone') {
       const digits = value.replace(/\D/g, '');
       if (digits.length <= 11) {
@@ -199,10 +181,7 @@ const ClientFormPage: React.FC = () => {
       return;
     }
     
-    // Handle all other inputs
     setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Clear error for this field if it exists
     if (errors[name]) {
       setErrors(prev => {
         const newErrors = { ...prev };
@@ -212,7 +191,6 @@ const ClientFormPage: React.FC = () => {
     }
   };
 
-  // Handle cancel
   const handleCancel = () => {
     if(authType === 'admin') {
       navigate('/admin/clients');

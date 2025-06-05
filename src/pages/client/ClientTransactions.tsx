@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import {api, type DailyTransaction} from "../../services";
 import {toast} from "react-hot-toast";
 import {useAuth} from "../../contexts/AuthContext.tsx";
+import {formatCurrency} from "../../lib/utils.ts";
 
 
 const ClientTransactions: React.FC = () => {
@@ -12,11 +13,9 @@ const ClientTransactions: React.FC = () => {
   const [recentActivities, setRecentActivities] = useState<DailyTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    // Fetch dashboard stats from API
     const fetchDashboardStats = async () => {
       try {
         setLoading(true);
-        // Get transactions from API
         const response = await api.get(`/daily-transactions/client/${client?.id}`);
         if(response.data) {
           const transactions: DailyTransaction[] = response.data.transactions || [];
@@ -36,27 +35,8 @@ const ClientTransactions: React.FC = () => {
     fetchDashboardStats().then();
   }, [client?.id]);
 
-  const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(amount);
-  };
-
-  const getStatusColor = (status: string): string => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'failed':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusText = (status: string): string => {
+  const getStatusText = (status: string | undefined): string => {
+    if(!status) return ''
     switch (status) {
       case 'completed':
         return 'Concluído';
@@ -162,7 +142,7 @@ const ClientTransactions: React.FC = () => {
                       recentActivities.map((transaction) => (
                       <tr key={transaction.id} className="hover:bg-orange-50 transition-colors duration-150">
                         <td className="px-2 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                          {new Date(transaction.date).toLocaleDateString('pt-BR')}
+                          {transaction.date ? new Date(transaction.date).toLocaleDateString('pt-BR') : 'Sem Registro'}
                         </td>
                         <td className="px-2 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                           {transaction.description}
@@ -176,11 +156,9 @@ const ClientTransactions: React.FC = () => {
                         </td>
                         <td className="px-2 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden sm:table-cell">
                           <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                              transaction.category
-                            )}`}
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full`}
                           >
-                            {getStatusText(transaction.category.name)}
+                            {getStatusText(transaction?.category?.name)}
                           </span>
                         </td>
                       </tr>
@@ -204,7 +182,7 @@ const ClientTransactions: React.FC = () => {
                     {formatCurrency(
                         recentActivities
                         .filter(t => t.type === 'income')
-                        .reduce((sum, t) => sum + t.amount, 0)
+                        .reduce((sum, t) => sum + Number(t.amount), 0)
                     )}
                   </div>
                 </div>
@@ -214,7 +192,7 @@ const ClientTransactions: React.FC = () => {
                     {formatCurrency(
                         recentActivities
                         .filter(t => t.type === 'expense')
-                        .reduce((sum, t) => sum + t.amount, 0)
+                        .reduce((sum, t) => sum + Number(t.amount), 0)
                     )}
                   </div>
                 </div>

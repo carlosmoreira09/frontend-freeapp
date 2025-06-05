@@ -21,17 +21,13 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ isOpen, onClo
     setLoading(true);
     
     try {
-      // Here you would normally call an API to add the transaction
-      // For now, we'll just simulate a delay
+
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Reset form and close modal
       setDescription('');
       setAmount('');
       setType('debit');
       onClose();
-      
-      // You might want to refresh the transactions list or show a success message
     } catch (error) {
       console.error('Erro ao adicionar transação:', error);
     } finally {

@@ -5,7 +5,6 @@ import Layout from '../../components/layout/Layout';
 import {api} from "../../services";
 import {formatCurrency, formatDate, getActivityStatusClass} from "../../lib/utils.ts";
 
-// Dashboard stats interface
 interface DashboardStats {
   totalClients: number;
   activeClients: number;
@@ -15,7 +14,6 @@ interface DashboardStats {
   lastLoginDate: string;
 }
 
-// Recent activity interface
 export interface RecentActivity {
   type: 'transaction' | 'registration' | 'system';
   clientId?: string;
@@ -35,7 +33,6 @@ const AdminDashboard: React.FC = () => {
   const [activitiesLoading, setActivitiesLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch dashboard stats from our new endpoint
     const fetchDashboardStats = async () => {
       try {
         const response = await api.get('/clients/stats/dashboard');
@@ -47,7 +44,6 @@ const AdminDashboard: React.FC = () => {
       }
     };
 
-    // Fetch recent activities from our new endpoint
     const fetchRecentActivities = async () => {
       try {
         setActivitiesLoading(true);
@@ -93,7 +89,7 @@ const AdminDashboard: React.FC = () => {
                 </Link>
                 <Link
                     to="/admin/settings"
-                    className="hidden items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 transition-colors duration-200"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 transition-colors duration-200"
                 >
                   Gerenciar Configurações
                 </Link>
@@ -178,8 +174,8 @@ const AdminDashboard: React.FC = () => {
             </div>
           </Link>
 
-          <Link to="/admin/settings" className="hidden  hover:shadow-lg transition-shadow duration-300">
-            <div className=" hidden bg-white overflow-hidden shadow rounded-lg">
+          <Link to="/admin/settings" className="block hover:shadow-lg transition-shadow duration-300">
+            <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="px-4 py-5 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 bg-orange-600 rounded-md p-3">
@@ -188,7 +184,7 @@ const AdminDashboard: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
-                  <div className="ml-5 hidden">
+                  <div className="ml-5">
                     <h3 className="text-lg font-medium text-gray-900">Configurações do Sistema</h3>
                     <p className="mt-1 text-sm text-gray-500">Configurar ajustes da aplicação</p>
                   </div>

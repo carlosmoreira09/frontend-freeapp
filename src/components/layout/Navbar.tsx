@@ -18,7 +18,6 @@ const Navbar: React.FC = () => {
     setMenuOpen(!menuOpen);
   };
 
-  // For client users on mobile, we only show a simplified header
   const isClientOnMobile = isAuthenticated && authType === AuthType.CLIENT;
 
   return (
@@ -53,7 +52,7 @@ const Navbar: React.FC = () => {
                     </Link>
                     <Link
                       to="/admin/settings"
-                      className="hidden text-orange-100 hover:bg-orange-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                      className="text-orange-100 hover:bg-orange-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
                     >
                       Configurações
                     </Link>
@@ -200,7 +199,7 @@ const Navbar: React.FC = () => {
                 </Link>
                 <Link
                   to="/admin/settings"
-                  className="hidden text-orange-100 hover:bg-orange-700 hover:text-white px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                  className="text-orange-100 hover:bg-orange-700 hover:text-white px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
                 >
                   Configurações
                 </Link>

@@ -32,11 +32,9 @@ interface TransactionChartsProps {
 }
 
 const TransactionCharts: React.FC<TransactionChartsProps> = ({ transactions, loading }) => {
-  // Process data for charts
   const chartData = useMemo(() => {
-    // Group transactions by date
     const groupedByDate = transactions.reduce((acc, transaction) => {
-      const date = new Date(transaction.date).toLocaleDateString('pt-BR');
+      const date = transaction.date ? new Date(transaction.date).toLocaleDateString('pt-BR') : ''
       if (!acc[date]) {
         acc[date] = {
           income: 0,
@@ -52,14 +50,11 @@ const TransactionCharts: React.FC<TransactionChartsProps> = ({ transactions, loa
       
       return acc;
     }, {} as Record<string, { income: number; expense: number }>);
-
-    // Sort dates
     const sortedDates = Object.keys(groupedByDate).sort((a, b) => {
       return new Date(a.split('/').reverse().join('-')).getTime() - 
              new Date(b.split('/').reverse().join('-')).getTime();
     });
 
-    // Group transactions by client
     const groupedByClient = transactions.reduce((acc, transaction) => {
       const clientName = transaction.clientName || 'Desconhecido';
       if (!acc[clientName]) {
@@ -78,7 +73,6 @@ const TransactionCharts: React.FC<TransactionChartsProps> = ({ transactions, loa
       return acc;
     }, {} as Record<string, { income: number; expense: number }>);
 
-    // Total by transaction type
     const totalByType = transactions.reduce((acc, transaction) => {
       if (transaction.type === TransactionType.INCOME) {
         acc.income += transaction.amount;

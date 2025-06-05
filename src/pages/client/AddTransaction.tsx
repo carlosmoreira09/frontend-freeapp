@@ -1,34 +1,44 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ClientLayout from '../../components/layout/ClientLayout';
+import CategorySelect from '../../components/CategorySelect';
+import { toast } from 'react-hot-toast';
+import {type DailyTransaction, dailyTransactionService, TransactionType} from "../../services";
 
 const AddTransaction: React.FC = () => {
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [type, setType] = useState<'credit' | 'debit'>('debit');
+  const [categoryId, setCategoryId] = useState('');
+  const [date, setDate] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!description || !amount) {
+    if (!description || !amount || !categoryId) {
+      toast.error('Por favor, preencha todos os campos obrigatórios');
       return;
     }
-    
-    setLoading(true);
-    
     try {
-      // Here you would normally call an API to add the transaction
-      // For now, we'll just simulate a delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Redirect back to transactions page
+      setLoading(true);
+      const transactionType = type === 'credit' ? TransactionType.INCOME : TransactionType.EXPENSE;
+      const formattedDate = date
+        ? new Date(date).toISOString() 
+        : new Date().toISOString();
+      const transaction: DailyTransaction = {
+        amount: parseFloat(amount),
+        type: transactionType,
+        description,
+        categoryId: categoryId,
+        date: formattedDate,
+      }
+      await dailyTransactionService.createDailyTransaction(transaction);
+      toast.success('Transação adicionada com sucesso!');
       navigate('/client/transactions');
-      
-      // You might want to refresh the transactions list or show a success message
     } catch (error) {
-      console.error('Erro ao adicionar transação:', error);
+      toast.error('Erro ao adicionar transação. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -37,6 +47,7 @@ const AddTransaction: React.FC = () => {
   const handleCancel = () => {
     navigate('/client/transactions');
   };
+  const today = new Date().toISOString().split('T')[0];
 
   return (
     <ClientLayout>
@@ -84,6 +95,23 @@ const AddTransaction: React.FC = () => {
               </div>
               
               <div>
+                <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
+                  Data (opcional)
+                </label>
+                <input
+                  type="date"
+                  id="date"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="shadow-sm focus:ring-orange-500 focus:border-orange-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                  max={today}
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Se não informada, será usada a data atual
+                </p>
+              </div>
+              
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Tipo
                 </label>
@@ -115,6 +143,17 @@ const AddTransaction: React.FC = () => {
                     </label>
                   </div>
                 </div>
+              </div>
+              
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                  Categoria
+                </label>
+                <CategorySelect
+                  value={categoryId}
+                  onChange={setCategoryId}
+                  required
+                />
               </div>
               
               <div className="flex justify-end space-x-3 pt-4">

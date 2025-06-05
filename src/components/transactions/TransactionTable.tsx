@@ -28,7 +28,6 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     return new Date(dateString).toLocaleDateString('pt-BR');
   };
   
-  // Generate page numbers for pagination
   const pageNumbers = [];
   const maxPageButtons = 5;
   
@@ -88,7 +87,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                   <tr key={transaction.id} className="hover:bg-orange-50 transition-colors duration-150">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {transaction.client.name || 'N/A'}
+                        {transaction?.client?.name || 'N/A'}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -113,11 +112,11 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{formatDate(transaction.date)}</div>
+                      <div className="text-sm text-gray-900">{transaction.date ? formatDate(transaction.date) : ''}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {transaction.category.name || 'Sem categoria'}
+                        {transaction?.category?.name || 'Sem categoria'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

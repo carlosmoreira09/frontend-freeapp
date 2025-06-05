@@ -15,12 +15,10 @@ const AdminClients: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Load clients from API
   useEffect(() => {
     fetchClients().then();
   }, [page, limit]);
 
-  // Fetch clients from API
   const fetchClients = async () => {
     try {
       setPage(1)
@@ -41,17 +39,14 @@ const AdminClients: React.FC = () => {
     }
   };
 
-  // Navigate to create client page
   const handleAddClient = () => {
     navigate('/admin/clients/new');
   };
 
-  // Navigate to edit client page
   const handleEditClient = (id: string) => {
     navigate(`/admin/clients/edit/${id}`);
   };
 
-  // Handle client deletion
   const handleDeleteClient = async (id: string) => {
     try {
       setIsDeleting(id);
@@ -67,7 +62,6 @@ const AdminClients: React.FC = () => {
     }
   };
 
-  // Get status label
   const getStatusLabel = (status: boolean | undefined): string => {
     if(status === undefined) return 'Inativo'
     switch (status) {
@@ -80,7 +74,6 @@ const AdminClients: React.FC = () => {
     }
   };
 
-  // Filter clients based on search term and status
   const filteredClients = clients.filter(client => {
     return client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          client.email.toLowerCase().includes(searchTerm.toLowerCase());

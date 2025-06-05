@@ -12,6 +12,9 @@ import AdminClients from './pages/admin/AdminClients'
 import ClientFormPage from './pages/commum/ClientFormPage.tsx'
 import AdminSettings from './pages/admin/AdminSettings'
 import AdminDailyTransactions from './pages/admin/AdminDailyTransactions'
+import AdminCategories from './pages/admin/AdminCategories'
+import AdminProfile from './pages/admin/AdminProfile'
+import AdminChangePassword from './pages/admin/AdminChangePassword'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import { AuthType } from './types'
 
@@ -48,6 +51,9 @@ function App() {
             <Route path="/admin/clients/edit/:id" element={<ClientFormPage />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             <Route path="/admin/transactions" element={<AdminDailyTransactions />} />
+            <Route path="/admin/categories" element={<AdminCategories />} />
+            <Route path="/admin/profile" element={<AdminProfile />} />
+            <Route path="/admin/change-password" element={<AdminChangePassword />} />
           </Route>
           
           {/* Catch all - redirect to login */}

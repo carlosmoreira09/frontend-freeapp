@@ -12,6 +12,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   clearError: () => void;
+  updateUserInfo: (user: User) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,7 +37,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Check if user is already logged in on mount
   useEffect(() => {
     const checkAuthStatus = () => {
       try {
@@ -111,6 +111,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
   };
 
+  const updateUserInfo = (user: User) => {
+    setUser(user)
+  }
+
 
   const value = {
     isAuthenticated,
@@ -122,6 +126,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     clearError,
+    updateUserInfo
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

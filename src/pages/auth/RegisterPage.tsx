@@ -16,14 +16,11 @@ const RegisterPage: React.FC = () => {
   const { isAuthenticated, authType } = useAuth();
   const navigate = useNavigate();
 
-  // Check if user is authorized to access this page
   useEffect(() => {
-    // If trying to register an admin, only admins can do this
     if (registerType === 'admin' && (!isAuthenticated || authType !== AuthType.ADMIN)) {
       navigate('/login');
     }
     
-    // If registration is disabled, redirect to login
     const registrationEnabled = localStorage.getItem('allowRegistration') === 'true';
     if (!registrationEnabled && !isAuthenticated) {
       navigate('/login');
@@ -34,7 +31,6 @@ const RegisterPage: React.FC = () => {
     e.preventDefault();
     setError(null);
     
-    // Validate form
     if (password !== confirmPassword) {
       setError('As senhas não coincidem');
       return;
@@ -47,7 +43,6 @@ const RegisterPage: React.FC = () => {
 
     setLoading(true);
     try {
-      // Register based on type
       await authService.register({
         name,
         email,
@@ -56,7 +51,6 @@ const RegisterPage: React.FC = () => {
       });
       
       setSuccess(true);
-      // Redirect to login after 2 seconds
       setTimeout(() => {
         navigate('/login');
       }, 2000);
@@ -71,9 +65,7 @@ const RegisterPage: React.FC = () => {
       setLoading(false);
     }
   };
-
-  // If user is not authenticated and not allowed to register, redirect to login
-  if (!isAuthenticated && localStorage.getItem('allowRegistration') !== 'true') {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-orange-50 to-white py-0 md:py-12 px-4 md:px-6">
         <div className="w-full max-w-md shadow-lg rounded-lg border border-orange-100 bg-white p-8">
@@ -94,7 +86,6 @@ const RegisterPage: React.FC = () => {
     );
   }
 
-  // If trying to register an admin but not authenticated as admin, redirect
   if (registerType === 'admin' && (!isAuthenticated || authType !== AuthType.ADMIN)) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-orange-50 to-white py-0 md:py-12 px-4 md:px-6">

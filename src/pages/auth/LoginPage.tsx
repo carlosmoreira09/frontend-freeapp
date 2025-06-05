@@ -11,7 +11,6 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if registration is enabled
     const isRegistrationEnabled = localStorage.getItem('allowRegistration') === 'true';
     setRegistrationEnabled(isRegistrationEnabled);
   }, []);
@@ -21,15 +20,13 @@ const LoginPage: React.FC = () => {
     clearError();
     
     try {
-     const result = await login(email, password);
-      // Redirect based on login type
+     await login(email, password);
       if (loginType === 'admin') {
         navigate('/admin/dashboard');
       } else {
         navigate('/client/dashboard');
       }
     } catch (err) {
-      // Error is handled by the auth context
       console.error('Falha no login:', err);
     }
   };

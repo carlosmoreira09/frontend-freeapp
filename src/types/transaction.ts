@@ -2,6 +2,7 @@
  * Transaction related types
  */
 import type {AdminClientData} from "./admin.ts";
+import type {Category} from "./category.ts";
 
 // Transaction type enum
 export enum TransactionType {
@@ -9,27 +10,20 @@ export enum TransactionType {
   EXPENSE = 'expense'
 }
 
-// Transaction status enum
-export enum TransactionStatus {
-  PENDING = 'pending',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-  CANCELLED = 'cancelled'
-}
-
 // Daily transaction interface
 export interface DailyTransaction {
-  id: string;
+  id?: string;
   description: string;
   amount: number;
   type: TransactionType;
-  date: string;
-  client: AdminClientData
-  clientId: string;
+  date?: string;
+  client?: AdminClientData
+  clientId?: string;
   clientName?: string;
-  category?: any;
-  createdAt: string;
-  updatedAt: string;
+  category?: Category;
+  categoryId?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Daily transaction filters

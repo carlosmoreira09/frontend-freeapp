@@ -14,7 +14,6 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
-// Define the filters state interface to match TransactionFilters component
 interface TransactionFiltersState {
   clientId: string;
   startDate: string;
@@ -22,7 +21,6 @@ interface TransactionFiltersState {
   type: TransactionType | '';
 }
 
-// Client information card component
 const ClientInfoCard: React.FC<{ client: AdminClientData | null; loading: boolean }> = ({ client, loading }) => {
   if (loading) {
     return (
@@ -123,7 +121,6 @@ const AdminDailyTransactions: React.FC = () => {
     type: '',
   });
 
-  // Fetch clients for filter dropdown
   useEffect(() => {
     const fetchClients = async () => {
       try {
@@ -139,7 +136,6 @@ const AdminDailyTransactions: React.FC = () => {
     fetchClients().then();
   }, []);
 
-  // Fetch all transactions once
   useEffect(() => {
     const fetchTransactions = async () => {
       setLoading(true);
@@ -157,18 +153,15 @@ const AdminDailyTransactions: React.FC = () => {
     fetchTransactions().then();
   }, []);
 
-  // Filter transactions and calculate summary based on filters
   const filteredTransactions = useMemo(() => {
     return allTransactions.filter(transaction => {
-      // Apply client filter
       if (filters.clientId && transaction.clientId !== filters.clientId) {
         return false;
       }
       
-      // Apply date range filter
       if (filters.startDate) {
         const startDate = new Date(filters.startDate);
-        const transactionDate = new Date(transaction.date);
+        const transactionDate = transaction.date ? new Date(transaction.date) : new Date();
         if (transactionDate < startDate) {
           return false;
         }
@@ -176,13 +169,12 @@ const AdminDailyTransactions: React.FC = () => {
       
       if (filters.endDate) {
         const endDate = new Date(filters.endDate);
-        const transactionDate = new Date(transaction.date);
+        const transactionDate = transaction.date ? new Date(transaction.date) : new Date();
         if (transactionDate > endDate) {
           return false;
         }
       }
       
-      // Apply transaction type filter
       if (filters.type && transaction.type !== filters.type) {
         return false;
       }
@@ -191,13 +183,11 @@ const AdminDailyTransactions: React.FC = () => {
     });
   }, [allTransactions, filters]);
 
-  // Calculate summary from filtered transactions
   useEffect(() => {
     setSummaryLoading(true);
     const calculateSummary = () => {
       const summaryData = filteredTransactions.reduce(
         (acc, transaction) => {
-          // Convert amount to number to ensure proper addition
           const amount = Number(transaction.amount);
           if (transaction.type == TransactionType.INCOME) {
             acc.income += amount;
@@ -208,16 +198,12 @@ const AdminDailyTransactions: React.FC = () => {
         },
         { income: 0, expense: 0, balance: 0 }
       );
-      
-      // Calculate balance
       setSummary(summaryData);
       setSummaryLoading(false);
     };
     
     calculateSummary();
   }, [filteredTransactions]);
-
-  // Fetch client details when clientId changes
   useEffect(() => {
     const fetchClientDetails = async () => {
       if (!filters.clientId) {
@@ -245,7 +231,7 @@ const AdminDailyTransactions: React.FC = () => {
 
   const handleFilterChange = (newFilters: TransactionFiltersState) => {
     setFilters(newFilters);
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   };
 
   return (
