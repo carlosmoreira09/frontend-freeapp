@@ -78,6 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
     try {
       const response = await authService.login({ email, password });
+
       setIsAuthenticated(true);
       setAuthType(response.type);
       if (response.type === AuthType.ADMIN && response.user) {

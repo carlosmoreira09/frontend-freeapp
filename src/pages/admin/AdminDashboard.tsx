@@ -51,7 +51,9 @@ const AdminDashboard: React.FC = () => {
         setRecentActivities(response.data);
       } catch (err) {
         console.error('Error fetching recent activities:', err);
+      } finally {
         setActivitiesLoading(false);
+
       }
     };
 
@@ -76,20 +78,20 @@ const AdminDashboard: React.FC = () => {
         {/* System Status */}
         {!loading && stats && (
           <div className="mb-6 bg-white overflow-hidden shadow rounded-lg border-t-4 border-orange-500">
-            <div className="px-4 py-5 sm:p-6 flex justify-between items-center">
-              <div>
+            <div className="px-4 py-5 sm:p-6 flex flex-col sm:flex-row sm:justify-between sm:items-center">
+              <div className="mb-4 sm:mb-0">
                 <h3 className="text-lg leading-6 font-medium text-gray-900">Acesso Rapido</h3>
               </div>
-              <div className="space-x-2">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Link
-                    to="/admin/clients/new"
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 transition-colors duration-200"
+                  to="/admin/clients/new"
+                  className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 transition-colors duration-200"
                 >
                   Adicionar Cliente
                 </Link>
                 <Link
-                    to="/admin/settings"
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 transition-colors duration-200"
+                  to="/admin/settings"
+                  className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 transition-colors duration-200"
                 >
                   Gerenciar Configurações
                 </Link>
