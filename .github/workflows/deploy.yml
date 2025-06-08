@@ -25,7 +25,7 @@ jobs:
       - name: Deploy to VPS
         run: |
           ssh root@172.235.128.30 "
-            cd /var/www/html/frontend-appfree &&
+            cd /var/www/html/frontend-freeapp &&
             git reset --hard &&
             git pull origin main &&
             npm install &&
