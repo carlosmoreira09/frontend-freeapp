@@ -1,4 +1,4 @@
-name: Deploy Frontend on Merge to Main
+name: Deploy to VM
 
 on:
   pull_request:
