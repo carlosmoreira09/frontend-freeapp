@@ -27,8 +27,6 @@ const ClientFormPage: React.FC = () => {
     zipCode: '',
     complement: '',
     maritalStatus: MaritalStatus.SINGLE,
-    password: '',
-    confirmPassword: '',
     isActive: true,
     managerId: ''
   });
@@ -36,7 +34,7 @@ const ClientFormPage: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   useEffect(() => {
     if (isEditMode) {
-      fetchClient();
+      fetchClient().then();
     }
   }, [id]);
   const fetchClient = async () => {
@@ -62,8 +60,6 @@ const ClientFormPage: React.FC = () => {
         complement: response.complement || '',
         maritalStatus: response.maritalStatus || MaritalStatus.SINGLE,
         isActive: response.isActive ?? true,
-        password: '',
-        confirmPassword: ''
       });
       }
 
@@ -98,26 +94,14 @@ const ClientFormPage: React.FC = () => {
     if (formData.phone && !/^\(\d{2}\) \d{5}-\d{4}$/.test(formData.phone)) {
       newErrors.phone = 'Telefone deve estar no formato (00) 00000-0000';
     }
-    
-    if (!isEditMode && !formData.password) {
-      newErrors.password = 'Senha é obrigatória para novos clientes';
-    }
-    
-    if (formData.password && formData.password.length < 6) {
-      newErrors.password = 'Senha deve ter pelo menos 6 caracteres';
-    }
-    
-    if (formData.password && formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'As senhas não coincidem';
-    }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    console.log('handleSubmit', validateForm());
     if (!validateForm()) {
       toast.error("Verifique seu formulário")
       return;

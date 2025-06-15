@@ -2,7 +2,7 @@ import axios, {type AxiosInstance } from 'axios';
 import { setupInterceptors } from '../interceptors';
 
 // Define the base URL for API requests
-export const API_URL = 'https://freeapp.com.br/api';
+export const API_URL = 'http://localhost:3000/api';
 
 /**
  * Creates and configures a new axios instance with all interceptors applied
