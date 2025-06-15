@@ -101,7 +101,6 @@ const ClientFormPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('handleSubmit', validateForm());
     if (!validateForm()) {
       toast.error("Verifique seu formulário")
       return;
