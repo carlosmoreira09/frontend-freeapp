@@ -8,3 +8,4 @@ export * from './client';
 export * from './admin';
 export * from './enum';
 export * from './transaction';
+export * from './monthlyBudget';

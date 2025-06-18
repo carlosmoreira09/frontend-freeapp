@@ -51,6 +51,12 @@ const Navbar: React.FC = () => {
                       Gerenciar Clientes
                     </Link>
                     <Link
+                      to="/admin/monthly-budgets"
+                      className="text-orange-100 hover:bg-orange-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                    >
+                      Orçamentos Mensais
+                    </Link>
+                    <Link
                       to="/admin/settings"
                       className="text-orange-100 hover:bg-orange-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
                     >
@@ -196,6 +202,12 @@ const Navbar: React.FC = () => {
                   className="text-orange-100 hover:bg-orange-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
                 >
                   Gerenciar Clientes
+                </Link>
+                <Link
+                  to="/admin/monthly-budgets"
+                  className="text-orange-100 hover:bg-orange-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+                >
+                  Orçamentos Mensais
                 </Link>
                 <Link
                   to="/admin/settings"

@@ -9,6 +9,8 @@ import ClientTransactions from './pages/client/ClientTransactions'
 import AddTransaction from './pages/client/AddTransaction'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminClients from './pages/admin/AdminClients'
+import AdminMonthlyBudgets from './pages/admin/AdminMonthlyBudgets'
+import AdminMonthlyBudgetEdit from './pages/admin/AdminMonthlyBudgetEdit'
 import ClientFormPage from './pages/commum/ClientFormPage.tsx'
 import AdminSettings from './pages/admin/AdminSettings'
 import AdminDailyTransactions from './pages/admin/AdminDailyTransactions'
@@ -54,6 +56,8 @@ function App() {
             <Route path="/admin/categories" element={<AdminCategories />} />
             <Route path="/admin/profile" element={<AdminProfile />} />
             <Route path="/admin/change-password" element={<AdminChangePassword />} />
+            <Route path="/admin/monthly-budgets" element={<AdminMonthlyBudgets />} />
+            <Route path="/admin/monthly-budgets/edit/:id" element={<AdminMonthlyBudgetEdit />} />
           </Route>
           
           {/* Catch all - redirect to login */}

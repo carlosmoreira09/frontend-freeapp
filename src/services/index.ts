@@ -4,6 +4,7 @@ export { default as authService } from './authService';
 export { default as clientService } from './clientService';
 export { default as adminService } from './adminService';
 export { default as dailyTransactionService } from './dailyTransactionService';
+export { default as monthlyBudgetService } from './monthlyBudgetService';
 
 // Re-export types from central types module
 export * from '../types';

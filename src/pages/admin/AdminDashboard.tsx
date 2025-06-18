@@ -125,9 +125,9 @@ const AdminDashboard: React.FC = () => {
 
         {/* Quick Access Cards */}
         <h2 className="text-xl font-bold text-gray-900 mb-4">Acesso Rápido</h2>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
           <Link to="/admin/clients" className="block hover:shadow-lg transition-shadow duration-300">
-            <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="bg-white overflow-hidden shadow rounded-lg h-full">
               <div className="px-4 py-5 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 bg-orange-500 rounded-md p-3">
@@ -135,9 +135,9 @@ const AdminDashboard: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                   </div>
-                  <div className="ml-5">
-                    <h3 className="text-lg font-medium text-gray-900">Gerenciar Clientes</h3>
-                    <p className="mt-1 text-sm text-gray-500">Visualizar e gerenciar contas de clientes</p>
+                  <div className="ml-5 flex-1 min-w-0">
+                    <h3 className="text-lg font-medium text-gray-900 truncate">Gerenciar Clientes</h3>
+                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">Visualizar e gerenciar contas de clientes</p>
                   </div>
                 </div>
               </div>
@@ -151,8 +151,33 @@ const AdminDashboard: React.FC = () => {
             </div>
           </Link>
 
+          <Link to="/admin/monthly-budgets" className="block hover:shadow-lg transition-shadow duration-300">
+            <div className="bg-white overflow-hidden shadow rounded-lg h-full">
+              <div className="px-4 py-5 sm:p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 bg-green-500 rounded-md p-3">
+                    <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="ml-5 flex-1 min-w-0">
+                    <h3 className="text-lg font-medium text-gray-900 truncate">Orçamentos Mensais</h3>
+                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">Gerenciar orçamentos dos clientes</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-orange-50 px-4 py-4 sm:px-6">
+                <div className="text-sm">
+                  <span className="font-medium text-orange-600 hover:text-orange-500">
+                    Ver orçamentos <span aria-hidden="true">&rarr;</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Link>
+
           <Link to="/admin/transactions" className="block hover:shadow-lg transition-shadow duration-300">
-            <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="bg-white overflow-hidden shadow rounded-lg h-full">
               <div className="px-4 py-5 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 bg-orange-400 rounded-md p-3">
@@ -160,9 +185,9 @@ const AdminDashboard: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <div className="ml-5">
-                    <h3 className="text-lg font-medium text-gray-900">Transações Diárias</h3>
-                    <p className="mt-1 text-sm text-gray-500">Visualizar e analisar transações</p>
+                  <div className="ml-5 flex-1 min-w-0">
+                    <h3 className="text-lg font-medium text-gray-900 truncate">Transações Diárias</h3>
+                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">Visualizar e analisar transações</p>
                   </div>
                 </div>
               </div>
@@ -177,7 +202,7 @@ const AdminDashboard: React.FC = () => {
           </Link>
 
           <Link to="/admin/settings" className="block hover:shadow-lg transition-shadow duration-300">
-            <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="bg-white overflow-hidden shadow rounded-lg h-full">
               <div className="px-4 py-5 sm:p-6">
                 <div className="flex items-center">
                   <div className="flex-shrink-0 bg-orange-600 rounded-md p-3">
@@ -186,9 +211,9 @@ const AdminDashboard: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
-                  <div className="ml-5">
-                    <h3 className="text-lg font-medium text-gray-900">Configurações do Sistema</h3>
-                    <p className="mt-1 text-sm text-gray-500">Configurar ajustes da aplicação</p>
+                  <div className="ml-5 flex-1 min-w-0">
+                    <h3 className="text-lg font-medium text-gray-900 truncate">Configurações do Sistema</h3>
+                    <p className="mt-1 text-sm text-gray-500 line-clamp-2">Configurar ajustes da aplicação</p>
                   </div>
                 </div>
               </div>
@@ -201,29 +226,6 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
           </Link>
-
-          <div className="hidden bg-white overflow-hidden shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0 bg-orange-400 rounded-md p-3">
-                  <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <div className="ml-5">
-                  <h3 className="text-lg font-medium text-gray-900">Relatórios</h3>
-                  <p className="mt-1 text-sm text-gray-500">Visualizar relatórios e análises do sistema</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-orange-50 px-4 py-4 sm:px-6">
-              <div className="text-sm">
-                <span className="font-medium text-orange-600 hover:text-orange-500">
-                  Ver relatórios <span aria-hidden="true">&rarr;</span>
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Recent Activity */}
