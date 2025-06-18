@@ -79,6 +79,12 @@ const Navbar: React.FC = () => {
                       Transações
                     </Link>
                     <Link
+                      to="/client/analytics"
+                      className="text-orange-100 hover:bg-orange-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                    >
+                      Análise Financeira
+                    </Link>
+                    <Link
                       to="/client/profile"
                       className="text-orange-100 hover:bg-orange-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
                     >

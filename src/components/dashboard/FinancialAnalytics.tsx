@@ -1,7 +1,7 @@
 import React from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement,
   type ChartOptions } from 'chart.js';
-import { Doughnut, Bar, Line } from 'react-chartjs-2';
+import {Doughnut, Line, Chart} from 'react-chartjs-2';
 
 // Register ChartJS components
 ChartJS.register(
@@ -114,21 +114,21 @@ const FinancialAnalytics: React.FC<FinancialAnalyticsProps> = ({
     }),
     datasets: [
       {
-        type: 'bar' as const,
+        type: 'line' as const,
         label: 'Receitas',
         data: monthlyBalance.map(month => month.income),
         backgroundColor: 'rgba(75, 192, 192, 0.5)',
         order: 2,
       },
       {
-        type: 'bar' as const,
+        type: 'line' as const,
         label: 'Despesas',
         data: monthlyBalance.map(month => month.expense),
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
         order: 3,
       },
       {
-        type: 'bar' as const,
+        type: 'line' as const,
         label: 'Saldo',
         data: monthlyBalance.map(month => month.balance),
         borderColor: 'rgb(53, 162, 235)',
@@ -301,10 +301,10 @@ const FinancialAnalytics: React.FC<FinancialAnalyticsProps> = ({
         <h3 className="text-lg font-medium text-gray-900 mb-4">Balanço Mensal</h3>
         {monthlyBalance.length > 0 ? (
           <div className="h-64">
-            <Bar
-              data={monthlyBalanceData}
-              options={barChartOptions}
-            />
+            <Chart
+                data={monthlyBalanceData}
+                options={barChartOptions}
+                type={'bar'}            />
           </div>
         ) : (
           <p className="text-center text-gray-500 py-4">Nenhum dado de balanço mensal disponível</p>

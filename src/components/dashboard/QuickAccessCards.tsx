@@ -31,6 +31,31 @@ const QuickAccessCards: React.FC = () => {
           </div>
         </Link>
 
+        <Link to="/client/analytics" className="block hover:shadow-lg transition-shadow duration-300">
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="px-3 py-4 sm:px-4 sm:py-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-blue-500 rounded-md p-2 sm:p-3">
+                  <svg className="h-4 w-4 sm:h-6 sm:w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <div className="ml-3 sm:ml-5 min-w-0 flex-1">
+                  <h3 className="text-sm sm:text-lg font-medium text-gray-900 truncate">Análise Financeira</h3>
+                  <p className="mt-1 text-xs sm:text-sm text-gray-500 truncate">Visualize gráficos e tendências</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-blue-50 px-3 py-2 sm:px-4 sm:py-3">
+              <div className="text-xs sm:text-sm">
+                <span className="font-medium text-blue-600 hover:text-blue-500">
+                  Ver análises <span aria-hidden="true">&rarr;</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </Link>
+
         <Link to="/client/transactions/new" className="block hover:shadow-lg transition-shadow duration-300">
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="px-3 py-4 sm:px-4 sm:py-5">
