@@ -31,43 +31,116 @@ const ClientTransactions: React.FC = () => {
   const [dailyStatus, setDailyStatus] = useState<DailyBudgetStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string>('');
+  const [availableDates, setAvailableDates] = useState<string[]>([]);
 
+  // Initial data fetch
   useEffect(() => {
-    const fetchTransactionsData = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch all transactions
-        const response = await api.get(`/daily-transactions/client/${client?.id}`);
-        if(response.data) {
-          const allTransactions: DailyTransaction[] = response.data.transactions || [];
-          // Group transactions by date
-          const grouped = groupTransactionsByDate(allTransactions);
-          setGroupedTransactions(grouped);
-          
-          // Set default selected date to today if transactions exist, otherwise first available date
-          const today = new Date().toISOString().split('T')[0];
-          const availableDates = Object.keys(grouped).sort().reverse();
-          const defaultDate = availableDates.includes(today) ? today : (availableDates[0] || today);
-          setSelectedDate(defaultDate);
-        }
-
-        // Fetch current daily budget status
-        const dailyBudgetStatus = await monthlyBudgetService.getCurrentDailyStatus();
-        setDailyStatus(dailyBudgetStatus);
-        
-      } catch (err) {
-        setError(err as string);
-        toast.error('Erro ao carregar transações: ' + err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (client?.id) {
-      fetchTransactionsData();
+      fetchInitialData();
     }
   }, [client?.id]);
+
+  // Fetch data when selected date changes
+  useEffect(() => {
+    if (selectedDate && client?.id) {
+      fetchDailyStatusForDate(selectedDate);
+    }
+  }, [selectedDate, client?.id]);
+
+  // Fetch initial data - all available dates
+  const fetchInitialData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch all transactions to get available dates
+      const response = await api.get(`/daily-transactions/client/${client?.id}`);
+      if(response.data) {
+        const allTransactions: DailyTransaction[] = response.data.transactions || [];
+        // Group transactions by date
+        const grouped = groupTransactionsByDate(allTransactions);
+        setGroupedTransactions(grouped);
+        
+        // Get available dates and sort them
+        const dates = Object.keys(grouped).sort().reverse();
+        setAvailableDates(dates);
+        
+        // Set default selected date to today if transactions exist, otherwise first available date
+        const today = new Date().toISOString().split('T')[0];
+        const defaultDate = dates.includes(today) ? today : (dates[0] || today);
+        setSelectedDate(defaultDate);
+      }
+
+      // Initial daily status fetch will happen in the date change effect
+      
+    } catch (err) {
+      setError(err as string);
+      toast.error('Erro ao carregar transações: ' + err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch transactions and daily status for a specific date
+  const fetchDailyStatusForDate = async (date: string) => {
+    try {
+      // Fetch daily budget status for the selected date
+      const dailyBudgetStatus = await monthlyBudgetService.getCurrentDailyStatus(date);
+      setDailyStatus(dailyBudgetStatus);
+      
+      // If we don't have transactions for this date yet, fetch them
+      if (!groupedTransactions[date]) {
+        await fetchTransactionsForDate(date);
+      }
+    } catch (err) {
+      toast.error('Erro ao carregar status diário: ' + err);
+    }
+  };
+
+  // Fetch transactions for a specific date
+  const fetchTransactionsForDate = async (date: string) => {
+    try {
+      const response = await api.get(`/daily-transactions/client/${client?.id}/date/${date}`);
+      
+      if (response.data) {
+        const transactions: DailyTransaction[] = response.data || [];
+        
+        // Create a new grouped object for this date
+        const newGrouped = { ...groupedTransactions };
+        
+        // Calculate totals for this date
+        let totalIncome = 0;
+        let totalExpense = 0;
+        
+        transactions.forEach(transaction => {
+          if (transaction.type === 'income') {
+            totalIncome += Number(transaction.amount);
+          } else {
+            totalExpense += Number(transaction.amount);
+          }
+        });
+        
+        // Add to grouped transactions
+        newGrouped[date] = {
+          transactions,
+          totalIncome,
+          totalExpense,
+          netAmount: totalIncome - totalExpense,
+          dailyBudget: dailyStatus?.dailyBudget || 0,
+          remainingBalance: (dailyStatus?.dailyBudget || 0) + totalIncome - totalExpense
+        };
+        
+        setGroupedTransactions(newGrouped);
+        
+        // If this is a new date we discovered, add it to available dates
+        if (!availableDates.includes(date)) {
+          const newDates = [...availableDates, date].sort().reverse();
+          setAvailableDates(newDates);
+        }
+      }
+    } catch (err) {
+      toast.error('Erro ao carregar transações para a data selecionada: ' + err);
+    }
+  };
 
   const groupTransactionsByDate = (transactions: DailyTransaction[]): GroupedTransactions => {
     const grouped: GroupedTransactions = {};
@@ -182,7 +255,11 @@ const ClientTransactions: React.FC = () => {
     }
   };
 
-  const sortedDates = Object.keys(groupedTransactions).sort().reverse();
+  const handleDateChange = (date: string) => {
+    setSelectedDate(date);
+  };
+
+  const sortedDates = availableDates;
   const selectedDateData = groupedTransactions[selectedDate];
 
   if (loading) {
@@ -284,7 +361,7 @@ const ClientTransactions: React.FC = () => {
                   return (
                     <button
                       key={dateKey}
-                      onClick={() => setSelectedDate(dateKey)}
+                      onClick={() => handleDateChange(dateKey)}
                       className={`flex-shrink-0 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 min-w-[80px] ${
                         isSelected
                           ? 'bg-orange-500 text-white shadow-md'
@@ -294,7 +371,7 @@ const ClientTransactions: React.FC = () => {
                       <div className="text-center">
                         <div className="font-semibold">{formatDateShort(dateKey)}</div>
                         <div className={`text-xs ${isSelected ? 'text-orange-100' : 'text-gray-500'}`}>
-                          {dayData.transactions.length} transação{dayData.transactions.length !== 1 ? 'ões' : ''}
+                          {dayData?.transactions.length || 0} transação{(dayData?.transactions.length || 0) !== 1 ? 'ões' : ''}
                         </div>
                       </div>
                     </button>

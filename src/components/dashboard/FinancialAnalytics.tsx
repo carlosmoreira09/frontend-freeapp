@@ -114,21 +114,21 @@ const FinancialAnalytics: React.FC<FinancialAnalyticsProps> = ({
     }),
     datasets: [
       {
-        type: 'line' as const,
+        type: 'bar' as const,
         label: 'Receitas',
         data: monthlyBalance.map(month => month.income),
         backgroundColor: 'rgba(75, 192, 192, 0.5)',
         order: 2,
       },
       {
-        type: 'line' as const,
+        type: 'bar' as const,
         label: 'Despesas',
         data: monthlyBalance.map(month => month.expense),
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
         order: 3,
       },
       {
-        type: 'line' as const,
+        type: 'bar' as const,
         label: 'Saldo',
         data: monthlyBalance.map(month => month.balance),
         borderColor: 'rgb(53, 162, 235)',

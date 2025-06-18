@@ -42,14 +42,18 @@ const monthlyBudgetService = {
   },
 
   // Get current daily budget status
-  getCurrentDailyStatus: async (): Promise<{
+  getCurrentDailyStatus: async (date?: string): Promise<{
     dailyBudget: number;
     remainingBalance: number;
     todaySpent: number;
     todayIncome: number;
     monthlyBudget: any;
   }> => {
-    const response = await api.get('/monthly-budgets/daily-status');
+    const url = date 
+      ? `/monthly-budgets/daily-status?date=${date}`
+      : '/monthly-budgets/daily-status';
+      
+    const response = await api.get(url);
     return response.data;
   },
 
