@@ -14,6 +14,7 @@ export enum TransactionType {
 export interface DailyTransaction {
   id?: string;
   description: string;
+  status?: string;
   amount: number;
   type: TransactionType;
   date?: string;
@@ -21,6 +22,7 @@ export interface DailyTransaction {
   clientId?: string;
   clientName?: string;
   category?: Category;
+  remainingBalanceAfterTransaction?: number;
   categoryId?: string;
   createdAt?: string;
   updatedAt?: string;

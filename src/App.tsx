@@ -7,6 +7,7 @@ import ClientDashboard from './pages/client/ClientDashboard'
 import ClientProfile from './pages/client/ClientProfile'
 import ClientTransactions from './pages/client/ClientTransactions'
 import AddTransaction from './pages/client/AddTransaction'
+import FinancialAnalyticsPage from './pages/client/FinancialAnalyticsPage'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminClients from './pages/admin/AdminClients'
 import AdminMonthlyBudgets from './pages/admin/AdminMonthlyBudgets'
@@ -40,7 +41,8 @@ function App() {
             <Route path="/client/dashboard" element={<ClientDashboard />} />
             <Route path="/client/profile" element={<ClientProfile />} />
             <Route path="/client/transactions" element={<ClientTransactions />} />
-            <Route path="/client/add-transaction" element={<AddTransaction />} />
+            <Route path="/client/transactions/new" element={<AddTransaction />} />
+            <Route path="/client/analytics" element={<FinancialAnalyticsPage />} />
             <Route path="/client/edit/:id" element={<ClientFormPage />} />
 
           </Route>

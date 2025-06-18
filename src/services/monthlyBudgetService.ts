@@ -41,6 +41,18 @@ const monthlyBudgetService = {
     return response.data;
   },
 
+  // Get current daily budget status
+  getCurrentDailyStatus: async (): Promise<{
+    dailyBudget: number;
+    remainingBalance: number;
+    todaySpent: number;
+    todayIncome: number;
+    monthlyBudget: any;
+  }> => {
+    const response = await api.get('/monthly-budgets/daily-status');
+    return response.data;
+  },
+
   // Update monthly budget (admin only)
   updateForAdmin: async (id: string, data: Partial<MonthlyBudgetFormData>): Promise<MonthlyBudget> => {
     const response = await api.put<MonthlyBudget>(`/monthly-budgets/${id}`, data);
