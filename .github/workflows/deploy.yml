@@ -26,8 +26,6 @@ jobs:
         run: |
           ssh root@172.235.128.30 "
             cd /var/www/html/frontend-freeapp &&
-            git config --global credential.helper store &&
-            echo 'https://${{ secrets.SSH_PRIVATE_KEY }}:x-oauth-basic@github.com' > ~/.git-credentials &&
             git reset --hard &&
             git pull origin main &&
             npm install &&
