@@ -19,6 +19,8 @@ interface DailyBudgetStatus {
   todaySpent: number;
   todayIncome: number;
   monthlyBudget: MonthlyBudget;
+  adjustedDailyBudget: number;
+  previousDayBalance: number;
 }
 
 const ClientDashboard: React.FC = () => {
@@ -63,7 +65,6 @@ const ClientDashboard: React.FC = () => {
         // Fetch daily budget status
         const dailyBudgetStatus = await monthlyBudgetService.getCurrentDailyStatus();
         setDailyStatus(dailyBudgetStatus);
-        console.log(dailyBudgetStatus);
       } catch (err) {
         toast.error('Erro ao buscar dados do painel: ' + err);
       } finally {

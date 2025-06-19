@@ -48,6 +48,8 @@ const monthlyBudgetService = {
     todaySpent: number;
     todayIncome: number;
     monthlyBudget: any;
+    adjustedDailyBudget: number;
+    previousDayBalance: number;
   }> => {
     const url = date 
       ? `/monthly-budgets/daily-status?date=${date}`

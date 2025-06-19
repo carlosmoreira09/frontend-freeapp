@@ -11,6 +11,8 @@ interface DailyBudgetStatus {
   todaySpent: number;
   todayIncome: number;
   monthlyBudget: any;
+  adjustedDailyBudget: number;
+  previousDayBalance: number;
 }
 
 interface GroupedTransactions {
@@ -43,7 +45,7 @@ const ClientTransactions: React.FC = () => {
   // Fetch data when selected date changes
   useEffect(() => {
     if (selectedDate && client?.id) {
-      fetchDailyStatusForDate(selectedDate);
+      fetchDailyStatusForDate(selectedDate).then();
     }
   }, [selectedDate, client?.id]);
 
@@ -85,8 +87,13 @@ const ClientTransactions: React.FC = () => {
     try {
       // Fetch daily budget status for the selected date
       const dailyBudgetStatus = await monthlyBudgetService.getCurrentDailyStatus(date);
+      if (selectedDate === availableDates[availableDates.length - 1]) {
+        dailyBudgetStatus.previousDayBalance = 0
+        dailyBudgetStatus.adjustedDailyBudget = 0
+        dailyBudgetStatus.remainingBalance = 0;
+      }
       setDailyStatus(dailyBudgetStatus);
-      
+
       // If we don't have transactions for this date yet, fetch them
       if (!groupedTransactions[date]) {
         await fetchTransactionsForDate(date);
@@ -119,14 +126,14 @@ const ClientTransactions: React.FC = () => {
           }
         });
         
-        // Add to grouped transactions
+        // Add to grouped transactions using adjusted daily budget
         newGrouped[date] = {
           transactions,
           totalIncome,
           totalExpense,
           netAmount: totalIncome - totalExpense,
-          dailyBudget: dailyStatus?.dailyBudget || 0,
-          remainingBalance: (dailyStatus?.dailyBudget || 0) + totalIncome - totalExpense
+          dailyBudget: dailyStatus?.adjustedDailyBudget || dailyStatus?.dailyBudget || 0,
+          remainingBalance: (dailyStatus?.adjustedDailyBudget || dailyStatus?.dailyBudget || 0) + totalIncome - totalExpense
         };
         
         setGroupedTransactions(newGrouped);
@@ -154,7 +161,7 @@ const ClientTransactions: React.FC = () => {
           totalIncome: 0,
           totalExpense: 0,
           netAmount: 0,
-          dailyBudget: dailyStatus?.dailyBudget || 0,
+          dailyBudget: 0,
           remainingBalance: 0
         };
       }
@@ -168,11 +175,11 @@ const ClientTransactions: React.FC = () => {
       }
     });
 
-    // Calculate net amounts and remaining balances
+    // Calculate net amounts (remaining balances will be calculated when daily status is fetched)
     Object.keys(grouped).forEach(dateKey => {
       const dayData = grouped[dateKey];
       dayData.netAmount = dayData.totalIncome - dayData.totalExpense;
-      dayData.remainingBalance = dayData.dailyBudget + dayData.totalIncome - dayData.totalExpense;
+      // Note: dailyBudget and remainingBalance will be set when we get the daily status for each date
     });
 
     return grouped;
@@ -297,42 +304,87 @@ const ClientTransactions: React.FC = () => {
           </div>
         </div>
 
-        {/* Today's Budget Status - Compact Mobile Version */}
+        {/* Daily Budget Status */}
         {dailyStatus && (
-          <div className="mb-4 bg-white shadow rounded-lg p-4 mx-2 sm:mx-0 sm:p-6">
-            <h3 className="text-sm font-medium text-gray-900 mb-3 sm:text-base">Status de Hoje</h3>
+          <div className="bg-white shadow rounded-lg p-4 mb-4 mx-2 sm:mx-0">
+            <h3 className="text-lg font-medium text-gray-900 mb-3">Status do Orçamento Diário</h3>
             
-            {/* Mobile: Single row with key metrics */}
-            <div className="flex justify-between items-center text-xs sm:text-sm px-2 sm:px-0">
-              <div className="text-center flex-1">
-                <div className="text-blue-600 font-medium">Orçamento</div>
-                <div className="text-blue-900 font-semibold">{formatCurrency(dailyStatus.dailyBudget)}</div>
-              </div>
-              <div className="text-center flex-1 border-l border-gray-200">
-                <div className="text-red-600 font-medium">Gasto</div>
-                <div className="text-red-900 font-semibold">{formatCurrency(dailyStatus.todaySpent)}</div>
-              </div>
-              <div className="text-center flex-1 border-l border-gray-200">
-                <div className="text-gray-600 font-medium">Restante</div>
-                <div className={`font-bold ${getBalanceColor(dailyStatus.remainingBalance)}`}>
-                  {formatCurrency(dailyStatus.remainingBalance)}
+            {/* Previous Day Balance Info */}
+            {dailyStatus.previousDayBalance !== 0 ? (
+              <div className="mb-3 p-3 rounded-lg bg-gray-50">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Saldo do dia anterior:</span>
+                  <span className={`font-medium ${
+                    dailyStatus.previousDayBalance > 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {dailyStatus.previousDayBalance > 0 ? '+' : ''}{formatCurrency(dailyStatus.previousDayBalance)}
+                  </span>
                 </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {dailyStatus.previousDayBalance > 0 
+                    ? 'Valor adicionado ao orçamento de hoje' 
+                    : 'Valor deduzido do orçamento de hoje'}
+                </div>
+              </div>
+            ) : (
+              // Show first day indicator when there's no previous balance and adjusted budget equals base budget
+              dailyStatus.adjustedDailyBudget === dailyStatus.dailyBudget && (
+                <div className="mb-3 p-3 rounded-lg bg-blue-50">
+                  <div className="flex items-center text-sm">
+                    <svg className="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-blue-700 font-medium">Primeiro dia de controle financeiro</span>
+                  </div>
+                  <div className="text-xs text-blue-600 mt-1">
+                    Começando com o orçamento base do mês
+                  </div>
+                </div>
+              )
+            )}
+            
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <p className="text-sm text-gray-600">Orçamento Base</p>
+                <p className="text-lg font-semibold text-blue-600">{formatCurrency(dailyStatus.dailyBudget)}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">
+                  {dailyStatus.adjustedDailyBudget === dailyStatus.dailyBudget 
+                    ? 'Orçamento de Hoje' 
+                    : 'Orçamento Ajustado'}
+                </p>
+                <p className={`text-lg font-semibold ${
+                  dailyStatus.adjustedDailyBudget >= dailyStatus.dailyBudget ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {formatCurrency(dailyStatus.adjustedDailyBudget)}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Gasto Hoje</p>
+                <p className="text-lg font-semibold text-red-600">{formatCurrency(dailyStatus.todaySpent)}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Saldo Restante</p>
+                <p className={`text-lg font-semibold ${getBalanceColor(dailyStatus.remainingBalance)}`}>
+                  {formatCurrency(dailyStatus.remainingBalance)}
+                </p>
               </div>
             </div>
             
-            {/* Progress bar for mobile */}
-            <div className="mt-3 px-2 sm:px-0">
-              <div className="flex justify-between text-xs text-gray-500 mb-1">
-                <span>Progresso do dia</span>
-                <span>{Math.round((dailyStatus.todaySpent / dailyStatus.dailyBudget) * 100)}%</span>
+            {/* Budget Progress Bar */}
+            <div className="mb-2">
+              <div className="flex justify-between text-sm text-gray-600 mb-1">
+                <span>Progresso do Orçamento</span>
+                <span>{Math.round((dailyStatus.todaySpent / (dailyStatus.adjustedDailyBudget || dailyStatus.dailyBudget)) * 100)}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
                   className={`h-2 rounded-full transition-all duration-300 ${
-                    dailyStatus.todaySpent > dailyStatus.dailyBudget ? 'bg-red-500' : 'bg-orange-500'
+                    dailyStatus.todaySpent > dailyStatus.adjustedDailyBudget ? 'bg-red-500' : 'bg-orange-500'
                   }`}
                   style={{ 
-                    width: `${Math.min((dailyStatus.todaySpent / dailyStatus.dailyBudget) * 100, 100)}%` 
+                    width: `${Math.min((dailyStatus.todaySpent / dailyStatus.adjustedDailyBudget) * 100, 100)}%` 
                   }}
                 ></div>
               </div>
