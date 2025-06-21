@@ -34,9 +34,11 @@ const AddTransaction: React.FC = () => {
         categoryId: categoryId,
         date: formattedDate,
       }
-      await dailyTransactionService.createDailyTransaction(transaction);
-      toast.success('Transação adicionada com sucesso!');
-      navigate('/client/transactions');
+      const result = await dailyTransactionService.createDailyTransaction(transaction);
+      if(result?.message.toString().includes('successfully')) {
+        toast.success('Transação adicionada com sucesso!');
+        navigate('/client/transactions');
+      }
     } catch (error) {
       toast.error('Erro ao adicionar transação. Tente novamente.');
     } finally {

@@ -58,12 +58,12 @@ const MobileFooterMenu: React.FC = () => {
         </Link>
 
         <Link
-          to="/client/add-transaction"
+          to="/client/transactions/new"
           className={`flex flex-col items-center justify-center text-white bg-orange-600 rounded-full w-14 h-14 mx-auto -mt-5 ${
-            isActive('/client/add-transaction') ? 'bg-orange-700' : 'bg-orange-600'
+            isActive('/client/transactions/new') ? 'bg-orange-700' : 'bg-orange-600'
           }`}
         >
-          <svg 
+          <svg
             className="w-6 h-6" 
             fill="none" 
             stroke="currentColor" 
