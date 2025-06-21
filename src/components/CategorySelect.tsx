@@ -27,7 +27,6 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
         setCategories(data);
         setError(null);
       } catch (err) {
-        console.error('Erro ao buscar categorias:', err);
         setError('Não foi possível carregar as categorias. Tente novamente mais tarde.');
       } finally {
         setLoading(false);
